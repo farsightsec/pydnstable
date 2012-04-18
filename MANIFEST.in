@@ -1,0 +1,1 @@
+include COPYRIGHT dnstable.c dnstable.pxi dnstable.pyx
