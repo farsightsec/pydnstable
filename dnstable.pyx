@@ -180,12 +180,16 @@ cdef class iteritems(object):
 
 cdef class query(object):
     cdef dnstable_query *_instance
+    cdef readonly str rrtype
+    cdef readonly str bailiwick
 
     def __cinit__(self):
         self._instance = NULL
 
     def __init__(self, qtype, str data, str rrtype=None, str bailiwick=None):
         cdef dnstable_res
+        self.rrtype = rrtype
+        self.bailiwick = bailiwick
 
         if not qtype in (RRSET, RDATA_IP, RDATA_RAW, RDATA_NAME):
             raise DnstableException, 'invalid qtype'
