@@ -218,7 +218,7 @@ cdef class reader(object):
     def __dealloc__(self):
         dnstable_reader_destroy(&self._instance)
 
-    def __init__(self, str fname, iszone=False):
+    def __init__(self, bytes fname, iszone=False):
         import os
         if not os.path.isfile(fname):
             raise DnstableException, 'cannot open file %s' % fname
