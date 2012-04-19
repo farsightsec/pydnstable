@@ -5,6 +5,9 @@ RDATA_IP = DNSTABLE_QUERY_TYPE_RDATA_IP
 RDATA_RAW = DNSTABLE_QUERY_TYPE_RDATA_RAW
 RDATA_NAME = DNSTABLE_QUERY_TYPE_RDATA_NAME
 
+class DnstableException(Exception):
+    pass
+
 cdef fmt_time(t):
     import time
     return time.strftime('%Y-%m-%d %H:%M:%S -0000', time.gmtime(t))
@@ -29,7 +32,7 @@ cdef class entry(object):
         self.etype = dnstable_entry_get_type(ent)
 
         if not self.etype in (DNSTABLE_ENTRY_TYPE_RRSET, DNSTABLE_ENTRY_TYPE_RDATA):
-            raise Exception, 'unhandled entry type'
+            raise DnstableException, 'unhandled entry type'
 
         # rrname
         res = dnstable_entry_get_rrname(ent, &data, &len_data)
@@ -69,7 +72,7 @@ cdef class entry(object):
             for i from 0 <= i < sz:
                 res = dnstable_entry_get_rdata(ent, i, &data, &len_data)
                 if res != dnstable_res_success:
-                    raise Exception, 'dnstable_entry_get_rdata() failed'
+                    raise DnstableException, 'dnstable_entry_get_rdata() failed'
                 self.d['rdata'].append(PyString_FromStringAndSize(<char *> data, len_data))
 
         if self.etype == DNSTABLE_ENTRY_TYPE_RRSET:
@@ -185,22 +188,22 @@ cdef class query(object):
         cdef dnstable_res
 
         if not qtype in (RRSET, RDATA_IP, RDATA_RAW, RDATA_NAME):
-            raise Exception, 'invalid qtype'
+            raise DnstableException, 'invalid qtype'
         self._instance = dnstable_query_init(qtype)
 
         res = dnstable_query_set_data(self._instance, PyString_AsString(data))
         if res != dnstable_res_success:
-            raise Exception, 'dnstable_query_set_data() failed: %s' % dnstable_query_get_error(self._instance)
+            raise DnstableException, 'dnstable_query_set_data() failed: %s' % dnstable_query_get_error(self._instance)
 
         if rrtype:
             res = dnstable_query_set_rrtype(self._instance, PyString_AsString(rrtype))
             if res != dnstable_res_success:
-                raise Exception, 'dnstable_query_set_rrtype() failed: %s' % dnstable_query_get_error(self._instance)
+                raise DnstableException, 'dnstable_query_set_rrtype() failed: %s' % dnstable_query_get_error(self._instance)
 
         if qtype == RRSET and bailiwick:
             res = dnstable_query_set_bailiwick(self._instance, PyString_AsString(bailiwick))
             if res != dnstable_res_success:
-                raise Exception, 'dnstable_query_set_bailiwick() failed: %s' % dnstable_query_get_error(self._instance)
+                raise DnstableException, 'dnstable_query_set_bailiwick() failed: %s' % dnstable_query_get_error(self._instance)
 
     def __dealloc__(self):
         dnstable_query_destroy(&self._instance)
@@ -218,7 +221,7 @@ cdef class reader(object):
     def __init__(self, str fname, iszone=False):
         import os
         if not os.path.isfile(fname):
-            raise Exception, 'cannot open file %s' % fname
+            raise DnstableException, 'cannot open file %s' % fname
         self._instance = dnstable_reader_init_fname(PyString_AsString(fname))
         self.iszone = iszone
 
