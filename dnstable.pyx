@@ -180,6 +180,7 @@ cdef class iteritems(object):
 
 cdef class query(object):
     cdef dnstable_query *_instance
+    cdef readonly str data
     cdef readonly str rrtype
     cdef readonly str bailiwick
 
@@ -188,6 +189,7 @@ cdef class query(object):
 
     def __init__(self, qtype, str data, str rrtype=None, str bailiwick=None):
         cdef dnstable_res
+        self.data = data
         self.rrtype = rrtype
         self.bailiwick = bailiwick
 
@@ -211,6 +213,16 @@ cdef class query(object):
 
     def __dealloc__(self):
         dnstable_query_destroy(&self._instance)
+
+    def __repr__(self):
+        s = self.data
+        if self.rrtype and self.rrtype.lower() != 'any':
+            s += '/' + self.rrtype.upper()
+        if self.bailiwick:
+            if (not self.rrtype) or (self.rrtype and self.rrtype.lower() == 'any'):
+                s += '/ANY'
+            s += '/' + self.bailiwick
+        return s
 
 cdef class reader(object):
     cdef dnstable_reader *_instance
