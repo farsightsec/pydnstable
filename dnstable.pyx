@@ -180,6 +180,7 @@ cdef class iteritems(object):
 
 cdef class query(object):
     cdef dnstable_query *_instance
+    cdef readonly int qtype
     cdef readonly str data
     cdef readonly str rrtype
     cdef readonly str bailiwick
@@ -196,6 +197,7 @@ cdef class query(object):
         if not qtype in (RRSET, RDATA_IP, RDATA_RAW, RDATA_NAME):
             raise DnstableException, 'invalid qtype'
         self._instance = dnstable_query_init(qtype)
+        self.qtype = qtype
 
         res = dnstable_query_set_data(self._instance, PyString_AsString(data))
         if res != dnstable_res_success:
@@ -215,7 +217,16 @@ cdef class query(object):
         dnstable_query_destroy(&self._instance)
 
     def __repr__(self):
-        s = self.data
+        if self.qtype == RDATA_IP:
+            s = 'ip '
+        elif self.qtype == RDATA_NAME:
+            s = 'name '
+        elif self.qtype == RDATA_RAW:
+            s = 'raw '
+        else:
+            s = ''
+
+        s += self.data
         if self.rrtype and self.rrtype.lower() != 'any':
             s += '/' + self.rrtype.upper()
         if self.bailiwick:
