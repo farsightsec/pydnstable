@@ -57,7 +57,7 @@ cdef extern from "dnstable.h":
     dnstable_res dnstable_query_set_bailiwick(dnstable_query *, char *)
 
     # reader
-    dnstable_reader * dnstable_reader_init_fname(char *)
+    dnstable_reader * dnstable_reader_init_setfile(char *)
     void dnstable_reader_destroy(dnstable_reader **)
     dnstable_iter * dnstable_reader_iter(dnstable_reader *)
     dnstable_iter * dnstable_reader_query(dnstable_reader *, dnstable_query *)

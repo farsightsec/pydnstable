@@ -249,7 +249,7 @@ cdef class reader(object):
         import os
         if not os.path.isfile(fname):
             raise DnstableException, 'cannot open file %s' % fname
-        self._instance = dnstable_reader_init_fname(PyString_AsString(fname))
+        self._instance = dnstable_reader_init_setfile(PyString_AsString(fname))
         self.iszone = iszone
 
     def query(self, query q):
