@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 NAME = 'pydnstable'
-VERSION = '0.1'
+VERSION = '0.2'
 
 from distutils.core import setup
 from distutils.extension import Extension
