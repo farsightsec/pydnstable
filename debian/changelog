@@ -1,0 +1,5 @@
+pydnstable (0.2-1~rsf60+1) squeeze-rsf; urgency=low
+
+  * Build for squeeze-rsf.
+
+ -- Robert S. Edmonds <edmonds@debian.org>  Sun, 30 Sep 2012 19:17:37 -0400
