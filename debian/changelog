@@ -1,3 +1,9 @@
+pydnstable (0.2-2) debian-rsf; urgency=low
+
+  * Build for wheezy-rsf.
+
+ -- Robert S. Edmonds <edmonds@debian.org>  Wed, 24 Oct 2012 16:31:23 -0400
+
 pydnstable (0.2-1~rsf60+1) squeeze-rsf; urgency=low
 
   * Build for squeeze-rsf.
