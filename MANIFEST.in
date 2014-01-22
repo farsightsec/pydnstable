@@ -1,1 +1,1 @@
-include COPYRIGHT LICENSE dnstable.c dnstable.pxi dnstable.pyx
+include COPYRIGHT LICENSE README.md dnstable.c dnstable.pxi dnstable.pyx
