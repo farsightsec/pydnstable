@@ -6,7 +6,7 @@ Build-Depends:
  debhelper (>= 9~),
  libdnstable-dev,
  python-all-dev (>= 2.6.6-3~),
- cython (>= 0.15~)
+ cython
 Standards-Version: 3.9.5
 
 Package: python-dnstable
