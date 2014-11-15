@@ -13,8 +13,15 @@ cdef fmt_time(t):
     return time.strftime('%Y-%m-%d %H:%M:%S -0000', time.gmtime(t))
 
 cdef class entry(object):
+    cdef dnstable_entry *_instance
     cdef dnstable_entry_type etype
     cdef dict d
+
+    def __cinit__(self):
+        self._instance = NULL
+
+    def __dealloc__(self):
+        dnstable_entry_destroy(&self._instance)
 
     def __init__(self):
         pass
@@ -81,6 +88,10 @@ cdef class entry(object):
             if res == dnstable_res_success:
                 self.d['bailiwick'] = PyString_FromStringAndSize(<char *> data, len_data)
 
+        if iszone:
+            dnstable_entry_set_iszone(ent, iszone)
+        self._instance = ent
+
     def __repr__(self):
         return self.to_text()
 
@@ -105,45 +116,19 @@ cdef class entry(object):
         return d
 
     def to_text(self):
-        import cStringIO
-        import wdns
+        cdef char *res
+        res = dnstable_entry_to_text(self._instance)
+        s = PyString_FromString(res)
+        free(res)
+        return s
 
-        s = cStringIO.StringIO()
-
-        if self.etype == DNSTABLE_ENTRY_TYPE_RRSET:
-            if 'bailiwick' in self.d:
-                s.write(';;  bailiwick: %s\n' % wdns.domain_to_str(self.d['bailiwick']))
-
-            if 'count' in self.d:
-                s.write(';;      count: %d\n' % self.d['count'])
-
-            if 'zone_time_first' in self.d:
-                s.write(';; first seen in zone file: %s\n' % fmt_time(self.d['zone_time_first']))
-
-            if 'zone_time_last' in self.d:
-                s.write(';;  last seen in zone file: %s\n' % fmt_time(self.d['zone_time_last']))
-
-            if 'time_first' in self.d:
-                s.write(';; first seen: %s\n' % fmt_time(self.d['time_first']))
-
-            if 'time_last' in self.d:
-                s.write(';;  last seen: %s\n' % fmt_time(self.d['time_last']))
-
-        if 'rdata' in self.d:
-            for rdata in self.d['rdata']:
-                s.write(wdns.domain_to_str(self.d['rrname']))
-                s.write(' IN ')
-                s.write(wdns.rrtype_to_str(self.d['rrtype']))
-                s.write(' ')
-                s.write(repr(wdns.rdata(rdata, wdns.CLASS_IN, self.d['rrtype'])))
-                s.write('\n')
-
-        s.seek(0)
-        return s.read()
 
     def to_json(self):
-        import json
-        return json.dumps(self.to_fmt_dict())
+        cdef char *res
+        res = dnstable_entry_to_json(self._instance)
+        s = PyString_FromString(res)
+        free(res)
+        return s
 
 @cython.internal
 cdef class iteritems(object):
@@ -175,7 +160,6 @@ cdef class iteritems(object):
             raise StopIteration
         d = entry()
         d.from_c(ent, self.iszone)
-        dnstable_entry_destroy(&ent)
         return d
 
 cdef class query(object):
