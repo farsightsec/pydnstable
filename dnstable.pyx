@@ -8,10 +8,6 @@ RDATA_NAME = DNSTABLE_QUERY_TYPE_RDATA_NAME
 class DnstableException(Exception):
     pass
 
-cdef fmt_time(t):
-    import time
-    return time.strftime('%Y-%m-%d %H:%M:%S -0000', time.gmtime(t))
-
 cdef class entry(object):
     cdef dnstable_entry *_instance
     cdef dnstable_entry_type etype
