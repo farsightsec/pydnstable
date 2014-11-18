@@ -118,7 +118,6 @@ cdef class entry(object):
         free(res)
         return s
 
-
     def to_json(self):
         cdef char *res
         res = dnstable_entry_to_json(self._instance)
