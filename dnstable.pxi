@@ -34,6 +34,7 @@ cdef extern from "dnstable.h":
 
     # entry
     void dnstable_entry_destroy(dnstable_entry **)
+    void dnstable_entry_set_iszone(dnstable_entry *, bool)
     dnstable_entry_type dnstable_entry_get_type(dnstable_entry *)
     dnstable_res dnstable_entry_get_rrname(dnstable_entry *, uint8_t **, size_t *)
     dnstable_res dnstable_entry_get_rrtype(dnstable_entry *, uint16_t *)
@@ -43,6 +44,8 @@ cdef extern from "dnstable.h":
     dnstable_res dnstable_entry_get_time_first(dnstable_entry *, uint64_t *)
     dnstable_res dnstable_entry_get_time_last(dnstable_entry *, uint64_t *)
     dnstable_res dnstable_entry_get_count(dnstable_entry *, uint64_t *)
+    char * dnstable_entry_to_json(dnstable_entry *)
+    char * dnstable_entry_to_text(dnstable_entry *)
 
     # iter
     void dnstable_iter_destroy(dnstable_iter **)
