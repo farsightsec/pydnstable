@@ -1,13 +1,13 @@
 Source: pydnstable
 Section: python
 Priority: optional
-Maintainer: Robert S. Edmonds <edmonds@debian.org>
+Maintainer: Robert Edmonds <edmonds@debian.org>
 Build-Depends:
  debhelper (>= 9~),
  libdnstable-dev,
  python-all-dev (>= 2.6.6-3~),
  cython
-Standards-Version: 3.9.5
+Standards-Version: 3.9.6
 
 Package: python-dnstable
 Architecture: any
