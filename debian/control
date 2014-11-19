@@ -4,6 +4,7 @@ Priority: optional
 Maintainer: Robert Edmonds <edmonds@debian.org>
 Build-Depends:
  debhelper (>= 9~),
+ pkg-config,
  libdnstable-dev (>= 0.7.0),
  python-all-dev (>= 2.6.6-3~),
  cython
