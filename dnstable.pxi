@@ -6,7 +6,7 @@ from libc.stdint cimport *
 from libc.stdlib cimport *
 from libc.string cimport *
 
-cdef extern from "dnstable.h":
+cdef extern from "dnstable.h" nogil:
     ctypedef enum dnstable_res:
         dnstable_res_failure
         dnstable_res_success
