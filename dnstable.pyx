@@ -231,6 +231,9 @@ cdef class reader(object):
         self._instance = dnstable_reader_init_setfile(PyString_AsString(fname))
         self.iszone = iszone
 
+    def reload(self):
+        dnstable_reader_reload_setfile(self._instance)
+
     def query(self, query q):
         it = iteritems(self.iszone)
         it._instance = dnstable_reader_query(self._instance, q._instance)

@@ -61,6 +61,7 @@ cdef extern from "dnstable.h":
 
     # reader
     dnstable_reader * dnstable_reader_init_setfile(char *)
+    void dnstable_reader_reload_setfile(dnstable_reader *)
     void dnstable_reader_destroy(dnstable_reader **)
     dnstable_iter * dnstable_reader_iter(dnstable_reader *)
     dnstable_iter * dnstable_reader_query(dnstable_reader *, dnstable_query *)
