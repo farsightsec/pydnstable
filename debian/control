@@ -5,6 +5,7 @@ Maintainer: Robert Edmonds <edmonds@debian.org>
 Build-Depends:
  cython,
  debhelper (>= 9~),
+ dh-python,
  libdnstable-dev (>= 0.7.0),
  pkg-config,
  python-all-dev (>= 2.6.6-3~),
