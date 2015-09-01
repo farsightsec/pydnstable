@@ -1,0 +1,5 @@
+.*swp
+/MANIFEST
+/build/
+/dist/
+/dnstable.c
