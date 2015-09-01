@@ -6,7 +6,7 @@ Build-Depends:
  cython,
  debhelper (>= 9~),
  dh-python,
- libdnstable-dev (>= 0.7.0),
+ libdnstable-dev (>= 0.8.0),
  pkg-config,
  python-all-dev (>= 2.6.6-3~),
 Standards-Version: 3.9.6
