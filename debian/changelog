@@ -1,0 +1,23 @@
+pydnstable (0.4.0-1) wheezy-farsightsec; urgency=medium
+
+  * New upstream release.
+
+ -- Robert Edmonds <edmonds@debian.org>  Wed, 19 Nov 2014 16:48:34 -0500
+
+pydnstable (0.3-1) debian-farsightsec; urgency=medium
+
+  * New upstream release.
+
+ -- Robert S. Edmonds <edmonds@debian.org>  Wed, 22 Jan 2014 14:46:02 -0500
+
+pydnstable (0.2-2) debian-rsf; urgency=low
+
+  * Build for wheezy-rsf.
+
+ -- Robert S. Edmonds <edmonds@debian.org>  Wed, 24 Oct 2012 16:31:23 -0400
+
+pydnstable (0.2-1~rsf60+1) squeeze-rsf; urgency=low
+
+  * Build for squeeze-rsf.
+
+ -- Robert S. Edmonds <edmonds@debian.org>  Sun, 30 Sep 2012 19:17:37 -0400
