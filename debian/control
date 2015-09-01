@@ -3,17 +3,17 @@ Section: python
 Priority: optional
 Maintainer: Robert Edmonds <edmonds@debian.org>
 Build-Depends:
+ cython,
  debhelper (>= 9~),
- pkg-config,
  libdnstable-dev (>= 0.7.0),
+ pkg-config,
  python-all-dev (>= 2.6.6-3~),
- cython
 Standards-Version: 3.9.6
 X-Python-Version: >= 2.7
 
 Package: python-dnstable
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, ${python:Depends}
+Depends: ${misc:Depends}, ${python:Depends}, ${shlibs:Depends}
 Description: passive DNS encoding format library (Python bindings)
  dnstable implements an encoding format for passive DNS data. It consists of a
  C library, libdnstable, and several command line utilities for creating,
