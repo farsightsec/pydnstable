@@ -2,12 +2,17 @@
 
 include "dnstable.pxi"
 
+import math
+
 RRSET = DNSTABLE_QUERY_TYPE_RRSET
 RDATA_IP = DNSTABLE_QUERY_TYPE_RDATA_IP
 RDATA_RAW = DNSTABLE_QUERY_TYPE_RDATA_RAW
 RDATA_NAME = DNSTABLE_QUERY_TYPE_RDATA_NAME
 
 class DnstableException(Exception):
+    pass
+
+class Timeout(DnstableException):
     pass
 
 cdef class entry(object):
@@ -155,6 +160,8 @@ cdef class iteritems(object):
         res = dnstable_iter_next(self._instance, &ent)
         if res == dnstable_res_failure:
             raise StopIteration
+        elif res == dnstable_res_timeout:
+            raise Timeout
         d = entry()
         d.from_c(ent, self.iszone)
         return d
@@ -169,8 +176,10 @@ cdef class query(object):
     def __cinit__(self):
         self._instance = NULL
 
-    def __init__(self, qtype, str data, str rrtype=None, str bailiwick=None):
+    def __init__(self, qtype, str data, str rrtype=None, str bailiwick=None, timeout=None):
         cdef dnstable_res
+        cdef timespec ts
+
         self.data = data
         self.rrtype = rrtype
         self.bailiwick = bailiwick
@@ -193,6 +202,16 @@ cdef class query(object):
             res = dnstable_query_set_bailiwick(self._instance, PyString_AsString(bailiwick))
             if res != dnstable_res_success:
                 raise DnstableException, 'dnstable_query_set_bailiwick() failed: %s' % dnstable_query_get_error(self._instance)
+
+        if timeout:
+            timeout=float(timeout)
+            if timeout < 0:
+                raise ValueError('timeout ({}) is not a positive number'.format(timeout))
+            ts.tv_sec = math.trunc(timeout)
+            ts.tv_nsec = math.modf(timeout)[0] * 1e9
+            res = dnstable_query_set_timeout(self._instance, &ts)
+            if res != dnstable_res_success:
+                raise DnstableException, 'dnstable_query_set_timeout() failed: %s' % dnstable_query_get_error(self._instance)
 
     def __dealloc__(self):
         dnstable_query_destroy(&self._instance)
