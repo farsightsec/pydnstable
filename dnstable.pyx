@@ -1,3 +1,5 @@
+#cython: embedsignature=True
+
 include "dnstable.pxi"
 
 RRSET = DNSTABLE_QUERY_TYPE_RRSET
