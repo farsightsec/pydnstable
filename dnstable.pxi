@@ -30,6 +30,12 @@ cdef extern from "dnstable.h":
         DNSTABLE_QUERY_TYPE_RDATA_IP
         DNSTABLE_QUERY_TYPE_RDATA_RAW
 
+    ctypedef enum dnstable_filter_parameter_type:
+        DNSTABLE_FILTER_PARAMETER_TIME_FIRST_BEFORE
+        DNSTABLE_FILTER_PARAMETER_TIME_FIRST_AFTER
+        DNSTABLE_FILTER_PARAMETER_TIME_LAST_BEFORE
+        DNSTABLE_FILTER_PARAMETER_TIME_LAST_AFTER
+
     struct dnstable_entry:
         pass
     struct dnstable_iter:
@@ -66,6 +72,7 @@ cdef extern from "dnstable.h":
     dnstable_res dnstable_query_set_rrtype(dnstable_query *, char *)
     dnstable_res dnstable_query_set_bailiwick(dnstable_query *, char *)
     dnstable_res dnstable_query_set_timeout(dnstable_query *, timespec *)
+    dnstable_res dnstable_query_set_filter_parameter(dnstable_query *, dnstable_filter_parameter_type, void *)
 
     # reader
     dnstable_reader * dnstable_reader_init_setfile(char *)

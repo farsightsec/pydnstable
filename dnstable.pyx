@@ -176,9 +176,10 @@ cdef class query(object):
     def __cinit__(self):
         self._instance = NULL
 
-    def __init__(self, qtype, str data, str rrtype=None, str bailiwick=None, timeout=None):
+    def __init__(self, qtype, str data, str rrtype=None, str bailiwick=None, time_first_before=None, time_first_after=None, time_last_before=None, time_last_after=None, timeout=None):
         cdef dnstable_res
         cdef timespec ts
+        cdef uint64_t tm
 
         self.data = data
         self.rrtype = rrtype
@@ -212,6 +213,34 @@ cdef class query(object):
             res = dnstable_query_set_timeout(self._instance, &ts)
             if res != dnstable_res_success:
                 raise DnstableException, 'dnstable_query_set_timeout() failed: %s' % dnstable_query_get_error(self._instance)
+
+        if time_first_before is not None:
+            tm = time_first_before
+            res = dnstable_query_set_filter_parameter(self._instance,
+                    DNSTABLE_FILTER_PARAMETER_TIME_FIRST_BEFORE, &tm)
+            if res != dnstable_res_success:
+                raise DnstableException, 'dnstable_query_set_filter_parameter(time_first_before) failed'
+
+        if time_first_after is not None:
+            tm = time_first_after
+            res = dnstable_query_set_filter_parameter(self._instance,
+                    DNSTABLE_FILTER_PARAMETER_TIME_FIRST_AFTER, &tm)
+            if res != dnstable_res_success:
+                raise DnstableException, 'dnstable_query_set_filter_parameter(time_first_after) failed'
+
+        if time_last_before is not None:
+            tm = time_last_before
+            res = dnstable_query_set_filter_parameter(self._instance,
+                    DNSTABLE_FILTER_PARAMETER_TIME_LAST_BEFORE, &tm)
+            if res != dnstable_res_success:
+                raise DnstableException, 'dnstable_query_set_filter_parameter(time_last_before) failed'
+
+        if time_last_after is not None:
+            tm = time_last_after
+            res = dnstable_query_set_filter_parameter(self._instance,
+                    DNSTABLE_FILTER_PARAMETER_TIME_LAST_AFTER, &tm)
+            if res != dnstable_res_success:
+                raise DnstableException, 'dnstable_query_set_filter_parameter(time_last_after) failed'
 
     def __dealloc__(self):
         dnstable_query_destroy(&self._instance)
