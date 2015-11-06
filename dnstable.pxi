@@ -72,7 +72,7 @@ cdef extern from "dnstable.h":
     dnstable_res dnstable_query_set_rrtype(dnstable_query *, char *)
     dnstable_res dnstable_query_set_bailiwick(dnstable_query *, char *)
     dnstable_res dnstable_query_set_timeout(dnstable_query *, timespec *)
-    dnstable_res dnstable_query_set_filter_parameter(dnstable_query *, dnstable_filter_parameter_type, void *)
+    dnstable_res dnstable_query_set_filter_parameter(dnstable_query *, dnstable_filter_parameter_type, void *, size_t)
 
     # reader
     dnstable_reader * dnstable_reader_init_setfile(char *)

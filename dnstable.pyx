@@ -217,28 +217,28 @@ cdef class query(object):
         if time_first_before is not None:
             tm = time_first_before
             res = dnstable_query_set_filter_parameter(self._instance,
-                    DNSTABLE_FILTER_PARAMETER_TIME_FIRST_BEFORE, &tm)
+                    DNSTABLE_FILTER_PARAMETER_TIME_FIRST_BEFORE, &tm, 8)
             if res != dnstable_res_success:
                 raise DnstableException, 'dnstable_query_set_filter_parameter(time_first_before) failed'
 
         if time_first_after is not None:
             tm = time_first_after
             res = dnstable_query_set_filter_parameter(self._instance,
-                    DNSTABLE_FILTER_PARAMETER_TIME_FIRST_AFTER, &tm)
+                    DNSTABLE_FILTER_PARAMETER_TIME_FIRST_AFTER, &tm, 8)
             if res != dnstable_res_success:
                 raise DnstableException, 'dnstable_query_set_filter_parameter(time_first_after) failed'
 
         if time_last_before is not None:
             tm = time_last_before
             res = dnstable_query_set_filter_parameter(self._instance,
-                    DNSTABLE_FILTER_PARAMETER_TIME_LAST_BEFORE, &tm)
+                    DNSTABLE_FILTER_PARAMETER_TIME_LAST_BEFORE, &tm, 8)
             if res != dnstable_res_success:
                 raise DnstableException, 'dnstable_query_set_filter_parameter(time_last_before) failed'
 
         if time_last_after is not None:
             tm = time_last_after
             res = dnstable_query_set_filter_parameter(self._instance,
-                    DNSTABLE_FILTER_PARAMETER_TIME_LAST_AFTER, &tm)
+                    DNSTABLE_FILTER_PARAMETER_TIME_LAST_AFTER, &tm, 8)
             if res != dnstable_res_success:
                 raise DnstableException, 'dnstable_query_set_filter_parameter(time_last_after) failed'
 
