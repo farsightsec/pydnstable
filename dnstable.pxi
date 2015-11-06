@@ -6,10 +6,17 @@ from libc.stdint cimport *
 from libc.stdlib cimport *
 from libc.string cimport *
 
+cdef extern from "sys/time.h" nogil:
+    ctypedef int time_t
+    cdef struct timespec:
+        time_t tv_sec
+        long   tv_nsec
+
 cdef extern from "dnstable.h":
     ctypedef enum dnstable_res:
         dnstable_res_failure
         dnstable_res_success
+        dnstable_res_timeout
 
     ctypedef enum dnstable_entry_type:
         DNSTABLE_ENTRY_TYPE_RRSET
@@ -58,6 +65,7 @@ cdef extern from "dnstable.h":
     dnstable_res dnstable_query_set_data(dnstable_query *, char *)
     dnstable_res dnstable_query_set_rrtype(dnstable_query *, char *)
     dnstable_res dnstable_query_set_bailiwick(dnstable_query *, char *)
+    dnstable_res dnstable_query_set_timeout(dnstable_query *, timespec *)
 
     # reader
     dnstable_reader * dnstable_reader_init_setfile(char *)
