@@ -26,7 +26,7 @@ try:
     setup(
         name = NAME,
         version = VERSION,
-        ext_modules = [ Extension('dnstable', ['dnstable.pyx'], **pkgconfig('libdnstable >= 0.8.0')) ],
+        ext_modules = [ Extension('dnstable', ['dnstable.pyx'], **pkgconfig('libdnstable >= 0.9.0')) ],
         cmdclass = {'build_ext': build_ext},
     )
 except ImportError:
@@ -35,7 +35,7 @@ except ImportError:
         setup(
             name = NAME,
             version = VERSION,
-            ext_modules = [ Extension('dnstable', ['dnstable.c'], **pkgconfig('libdnstable >= 0.8.0')) ],
+            ext_modules = [ Extension('dnstable', ['dnstable.c'], **pkgconfig('libdnstable >= 0.9.0')) ],
         )
     else:
         raise
