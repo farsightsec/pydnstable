@@ -1,3 +1,10 @@
+pydnstable (0.6.1-1) debian-farsightsec; urgency=medium
+
+  * Fix bug with negative epoch times. Add try/except around time
+    conversions from signed python integers.
+
+ -- Farsight Security, Inc. <software@farsightsecurity.com>  Mon, 15 Oct 2018 11:32:58 -0400
+
 pydnstable (0.6.0-1) wheezy-farsightsec; urgency=medium
 
   * New upstream release.
