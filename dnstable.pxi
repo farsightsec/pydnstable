@@ -12,7 +12,7 @@ cdef extern from "sys/time.h" nogil:
         time_t tv_sec
         long   tv_nsec
 
-cdef extern from "dnstable.h":
+cdef extern from "dnstable.h" nogil:
     ctypedef enum dnstable_res:
         dnstable_res_failure
         dnstable_res_success
