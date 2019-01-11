@@ -33,7 +33,7 @@ cdef class entry(object):
         cdef dnstable_res res
         cdef uint16_t u16
         cdef uint64_t u64
-        cdef uint8_t *data
+        cdef const uint8_t *data
         cdef size_t len_data
         cdef size_t sz
         cdef size_t i
@@ -47,7 +47,7 @@ cdef class entry(object):
         # rrname
         res = dnstable_entry_get_rrname(ent, &data, &len_data)
         if res == dnstable_res_success:
-            self.d['rrname'] = PyString_FromStringAndSize(<char *> data, len_data)
+            self.d['rrname'] = data[:len_data]
 
         # rrtype
         res = dnstable_entry_get_rrtype(ent, &u16)
@@ -83,13 +83,13 @@ cdef class entry(object):
                 res = dnstable_entry_get_rdata(ent, i, &data, &len_data)
                 if res != dnstable_res_success:
                     raise DnstableException, 'dnstable_entry_get_rdata() failed'
-                self.d['rdata'].append(PyString_FromStringAndSize(<char *> data, len_data))
+                self.d['rdata'].append(data[:len_data].decode('utf-8'))
 
         if self.etype == DNSTABLE_ENTRY_TYPE_RRSET:
             # bailiwick
             res = dnstable_entry_get_bailiwick(ent, &data, &len_data)
             if res == dnstable_res_success:
-                self.d['bailiwick'] = PyString_FromStringAndSize(<char *> data, len_data)
+                self.d['bailiwick'] = data[:len_data].decode('utf-8')
 
         if iszone:
             dnstable_entry_set_iszone(ent, iszone)
@@ -121,14 +121,14 @@ cdef class entry(object):
     def to_text(self):
         cdef char *res
         res = dnstable_entry_to_text(self._instance)
-        s = PyString_FromString(res)
+        s = res
         free(res)
         return s
 
     def to_json(self):
         cdef char *res
         res = dnstable_entry_to_json(self._instance)
-        s = PyString_FromString(res)
+        s = res
         free(res)
         return s
 
@@ -190,17 +190,17 @@ cdef class query(object):
         self._instance = dnstable_query_init(qtype)
         self.qtype = qtype
 
-        res = dnstable_query_set_data(self._instance, PyString_AsString(data))
+        res = dnstable_query_set_data(self._instance, data.encode('UTF-8'))
         if res != dnstable_res_success:
             raise DnstableException, 'dnstable_query_set_data() failed: %s' % dnstable_query_get_error(self._instance)
 
         if rrtype:
-            res = dnstable_query_set_rrtype(self._instance, PyString_AsString(rrtype))
+            res = dnstable_query_set_rrtype(self._instance, rrtype.encode('UTF-8'))
             if res != dnstable_res_success:
                 raise DnstableException, 'dnstable_query_set_rrtype() failed: %s' % dnstable_query_get_error(self._instance)
 
         if qtype == RRSET and bailiwick:
-            res = dnstable_query_set_bailiwick(self._instance, PyString_AsString(bailiwick))
+            res = dnstable_query_set_bailiwick(self._instance, bailiwick.encode('UTF-8'))
             if res != dnstable_res_success:
                 raise DnstableException, 'dnstable_query_set_bailiwick() failed: %s' % dnstable_query_get_error(self._instance)
 
@@ -290,7 +290,7 @@ cdef class reader(object):
         import os
         if not os.path.isfile(fname):
             raise DnstableException, 'cannot open file %s' % fname
-        self._instance = dnstable_reader_init_setfile(PyString_AsString(fname))
+        self._instance = dnstable_reader_init_setfile(fname.encode('UTF-8'))
         self.iszone = iszone
 
     def reload(self):
