@@ -96,7 +96,7 @@ cdef class entry(object):
                 res = dnstable_entry_get_rdata(ent, i, &data, &len_data)
                 if res != dnstable_res_success:
                     raise DnstableException, 'dnstable_entry_get_rdata() failed'
-                self.d['rdata'].append(data[:len_data].decode('utf-8'))
+                self.d['rdata'].append(data[:len_data])
 
         if self.etype == DNSTABLE_ENTRY_TYPE_RRSET:
             # bailiwick
@@ -106,6 +106,7 @@ cdef class entry(object):
 
         if iszone:
             dnstable_entry_set_iszone(ent, iszone)
+
         self._instance = ent
 
     def __repr__(self):
@@ -134,14 +135,14 @@ cdef class entry(object):
     def to_text(self):
         cdef char *res
         res = dnstable_entry_to_text(self._instance)
-        s = res
+        s = res.decode('utf-8')
         free(res)
         return s
 
     def to_json(self):
         cdef char *res
         res = dnstable_entry_to_json(self._instance)
-        s = res
+        s = res.decode('utf-8')
         free(res)
         return s
 
@@ -171,10 +172,12 @@ cdef class iteritems(object):
             raise StopIteration
 
         res = dnstable_iter_next(self._instance, &ent)
+
         if res == dnstable_res_failure:
             raise StopIteration
         elif res == dnstable_res_timeout:
             raise Timeout
+
         d = entry()
         d.from_c(ent, self.iszone)
         return d
@@ -189,7 +192,8 @@ cdef class query(object):
     def __cinit__(self):
         self._instance = NULL
 
-    def __init__(self, qtype, str data, str rrtype=None, str bailiwick=None, time_first_before=None, time_first_after=None, time_last_before=None, time_last_after=None, timeout=None):
+    def __init__(self, qtype, str data, str rrtype=None, str bailiwick=None, time_first_before=None,
+                 time_first_after=None, time_last_before=None, time_last_after=None, timeout=None):
         cdef dnstable_res
         cdef timespec ts
         cdef uint64_t tm
@@ -299,9 +303,9 @@ cdef class reader(object):
     def __dealloc__(self):
         dnstable_reader_destroy(&self._instance)
 
-    def __init__(self, bytes fname, iszone=False):
+    def __init__(self, str fname, iszone=False):
         import os
-        if not os.path.isfile(fname):
+        if not os.path.isfile(fname.encode('UTF-8')):
             raise DnstableException, 'cannot open file %s' % fname
         self._instance = dnstable_reader_init_setfile(fname.encode('UTF-8'))
         self.iszone = iszone
