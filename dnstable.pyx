@@ -172,11 +172,12 @@ cdef class query(object):
     cdef readonly str data
     cdef readonly str rrtype
     cdef readonly str bailiwick
+    cdef readonly bool aggregate
 
     def __cinit__(self):
         self._instance = NULL
 
-    def __init__(self, qtype, str data, str rrtype=None, str bailiwick=None, time_first_before=None, time_first_after=None, time_last_before=None, time_last_after=None, timeout=None):
+    def __init__(self, qtype, str data, str rrtype=None, str bailiwick=None, time_first_before=None, time_first_after=None, time_last_before=None, time_last_after=None, timeout=None, aggregate=True):
         cdef dnstable_res
         cdef timespec ts
         cdef uint64_t tm
@@ -184,6 +185,7 @@ cdef class query(object):
         self.data = data
         self.rrtype = rrtype
         self.bailiwick = bailiwick
+        self.aggregate = aggregate
 
         if not qtype in (RRSET, RDATA_IP, RDATA_RAW, RDATA_NAME):
             raise DnstableException, 'invalid qtype'
@@ -298,6 +300,10 @@ cdef class reader(object):
 
     def query(self, query q):
         it = iteritems(self.iszone)
-        it._instance = dnstable_reader_query(self._instance, q._instance)
+
+        if q.aggregate:
+            it._instance = dnstable_reader_query(self._instance, q._instance)
+        else:
+            it._instance = dnstable_reader_query_no_aggregate(self._instance, q._instance)
         it.q = q
         return it

@@ -80,3 +80,4 @@ cdef extern from "dnstable.h":
     void dnstable_reader_destroy(dnstable_reader **)
     dnstable_iter * dnstable_reader_iter(dnstable_reader *)
     dnstable_iter * dnstable_reader_query(dnstable_reader *, dnstable_query *)
+    dnstable_iter * dnstable_reader_query_no_aggregate(dnstable_reader *, dnstable_query *)
