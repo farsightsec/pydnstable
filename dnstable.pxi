@@ -70,6 +70,7 @@ cdef extern from "dnstable.h":
     char * dnstable_query_get_error(dnstable_query *)
     dnstable_res dnstable_query_set_data(dnstable_query *, char *)
     dnstable_res dnstable_query_set_rrtype(dnstable_query *, char *)
+    dnstable_res dnstable_query_set_aggregated(dnstable_query *, bool)
     dnstable_res dnstable_query_set_bailiwick(dnstable_query *, char *)
     dnstable_res dnstable_query_set_timeout(dnstable_query *, timespec *)
     dnstable_res dnstable_query_set_filter_parameter(dnstable_query *, dnstable_filter_parameter_type, void *, size_t)
@@ -80,4 +81,3 @@ cdef extern from "dnstable.h":
     void dnstable_reader_destroy(dnstable_reader **)
     dnstable_iter * dnstable_reader_iter(dnstable_reader *)
     dnstable_iter * dnstable_reader_query(dnstable_reader *, dnstable_query *)
-    dnstable_iter * dnstable_reader_query_no_aggregate(dnstable_reader *, dnstable_query *)

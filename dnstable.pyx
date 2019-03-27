@@ -201,6 +201,11 @@ cdef class query(object):
             if res != dnstable_res_success:
                 raise DnstableException, 'dnstable_query_set_rrtype() failed: %s' % dnstable_query_get_error(self._instance)
 
+        if aggregate == False:
+            res = dnstable_query_set_aggregated(self._instance, False)
+            if res != dnstable_res_success:
+                raise DnstableException, 'dnstable_query_set_aggregated() failed: %s' % dnstable_query_get_error(self._instance)
+
         if qtype == RRSET and bailiwick:
             res = dnstable_query_set_bailiwick(self._instance, PyString_AsString(bailiwick))
             if res != dnstable_res_success:
@@ -301,9 +306,6 @@ cdef class reader(object):
     def query(self, query q):
         it = iteritems(self.iszone)
 
-        if q.aggregate:
-            it._instance = dnstable_reader_query(self._instance, q._instance)
-        else:
-            it._instance = dnstable_reader_query_no_aggregate(self._instance, q._instance)
+        it._instance = dnstable_reader_query(self._instance, q._instance)
         it.q = q
         return it
