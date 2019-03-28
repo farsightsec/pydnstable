@@ -1,5 +1,6 @@
 cimport cython
-from cpython cimport bool
+from libcpp cimport bool
+#wrong bool: from cpython cimport bool
 from cpython.string cimport *
 from libc.stddef cimport *
 from libc.stdint cimport *
@@ -70,7 +71,7 @@ cdef extern from "dnstable.h":
     char * dnstable_query_get_error(dnstable_query *)
     dnstable_res dnstable_query_set_data(dnstable_query *, char *)
     dnstable_res dnstable_query_set_rrtype(dnstable_query *, char *)
-    dnstable_res dnstable_query_set_not_aggregated(dnstable_query *)
+    dnstable_res dnstable_query_set_aggregated(dnstable_query *, bool)
     bool dnstable_query_is_aggregated(const dnstable_query *)
     dnstable_res dnstable_query_set_bailiwick(dnstable_query *, char *)
     dnstable_res dnstable_query_set_timeout(dnstable_query *, timespec *)

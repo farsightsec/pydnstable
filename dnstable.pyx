@@ -176,7 +176,7 @@ cdef class query(object):
     def __cinit__(self):
         self._instance = NULL
 
-    def __init__(self, qtype, str data, str rrtype=None, str bailiwick=None, time_first_before=None, time_first_after=None, time_last_before=None, time_last_after=None, timeout=None, bool aggregate=True):
+    def __init__(self, qtype, str data, str rrtype=None, str bailiwick=None, time_first_before=None, time_first_after=None, time_last_before=None, time_last_after=None, timeout=None, aggregate=True):
         cdef dnstable_res
         cdef timespec ts
         cdef uint64_t tm
@@ -199,10 +199,9 @@ cdef class query(object):
             if res != dnstable_res_success:
                 raise DnstableException, 'dnstable_query_set_rrtype() failed: %s' % dnstable_query_get_error(self._instance)
 
-        if aggregate == False:
-            res = dnstable_query_set_not_aggregated(self._instance)
-            if res != dnstable_res_success:
-                raise DnstableException, 'dnstable_query_set_aggregated() failed: %s' % dnstable_query_get_error(self._instance)
+        res = dnstable_query_set_aggregated(self._instance, aggregate)
+        if res != dnstable_res_success:
+            raise DnstableException, 'dnstable_query_set_aggregated() failed: %s' % dnstable_query_get_error(self._instance)
 
         if qtype == RRSET and bailiwick:
             res = dnstable_query_set_bailiwick(self._instance, PyString_AsString(bailiwick))
