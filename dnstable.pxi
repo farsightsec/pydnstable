@@ -1,6 +1,5 @@
 cimport cython
 from libcpp cimport bool
-#wrong bool: from cpython cimport bool
 from cpython.string cimport *
 from libc.stddef cimport *
 from libc.stdint cimport *
