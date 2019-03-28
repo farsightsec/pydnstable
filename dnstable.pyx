@@ -172,12 +172,11 @@ cdef class query(object):
     cdef readonly str data
     cdef readonly str rrtype
     cdef readonly str bailiwick
-    cdef readonly bool aggregate
 
     def __cinit__(self):
         self._instance = NULL
 
-    def __init__(self, qtype, str data, str rrtype=None, str bailiwick=None, time_first_before=None, time_first_after=None, time_last_before=None, time_last_after=None, timeout=None, aggregate=True):
+    def __init__(self, qtype, str data, str rrtype=None, str bailiwick=None, time_first_before=None, time_first_after=None, time_last_before=None, time_last_after=None, timeout=None, bool aggregate=True):
         cdef dnstable_res
         cdef timespec ts
         cdef uint64_t tm
@@ -185,7 +184,6 @@ cdef class query(object):
         self.data = data
         self.rrtype = rrtype
         self.bailiwick = bailiwick
-        self.aggregate = aggregate
 
         if not qtype in (RRSET, RDATA_IP, RDATA_RAW, RDATA_NAME):
             raise DnstableException, 'invalid qtype'
@@ -202,7 +200,7 @@ cdef class query(object):
                 raise DnstableException, 'dnstable_query_set_rrtype() failed: %s' % dnstable_query_get_error(self._instance)
 
         if aggregate == False:
-            res = dnstable_query_set_aggregated(self._instance, False)
+            res = dnstable_query_set_not_aggregated(self._instance)
             if res != dnstable_res_success:
                 raise DnstableException, 'dnstable_query_set_aggregated() failed: %s' % dnstable_query_get_error(self._instance)
 
