@@ -16,8 +16,10 @@
 NAME = 'pydnstable'
 VERSION = '0.7.0'
 
+import os
 from distutils.core import setup, Command
 from distutils.extension import Extension
+from distutils.command.clean import clean
 import unittest
 
 class Test(Command):
@@ -32,6 +34,13 @@ class Test(Command):
         unittest.TextTestRunner(verbosity=1).run(
             unittest.TestLoader().discover('tests'))
 
+class Cleaner(clean):
+        def run(self):
+            clean.run(self)
+            for i in ["dnstable.c"]:
+                if os.path.isfile(i):
+                    print "Cleaning ", i
+                    os.unlink(i)
 
 def pkgconfig(*packages, **kw):
     import subprocess
@@ -64,7 +73,7 @@ try:
         name = NAME,
         version = VERSION,
         ext_modules = [ Extension('dnstable', ['dnstable.pyx'], **pkgconfig('libdnstable >= 0.9.0')) ],
-        cmdclass = {'build_ext': build_ext, 'test': Test},
+        cmdclass = {'build_ext': build_ext, 'clean': Cleaner, 'test': Test}
     )
 except ImportError:
     import os
