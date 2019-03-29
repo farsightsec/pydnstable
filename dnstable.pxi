@@ -85,6 +85,7 @@ cdef extern from "dnstable.h" nogil:
     char * dnstable_query_get_error(dnstable_query *)
     dnstable_res dnstable_query_set_data(dnstable_query *, char *)
     dnstable_res dnstable_query_set_rrtype(dnstable_query *, char *)
+    dnstable_res dnstable_query_set_skip(dnstable_query *, uint64_t)
     dnstable_res dnstable_query_set_aggregated(dnstable_query *, bool)
     bool dnstable_query_is_aggregated(const dnstable_query *)
     dnstable_res dnstable_query_set_bailiwick(dnstable_query *, char *)
