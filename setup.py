@@ -15,6 +15,12 @@
 
 NAME = 'pydnstable'
 VERSION = '0.7.0'
+LICENSE = 'Apache License 2.0'
+DESCRIPTION = 'Python extension module for the dnstable C library'
+URL = 'https://github.com/farsightsec/pydnstable'
+AUTHOR = 'Farsight Security, Inc.'
+AUTHOR_EMAIL = 'software@farsightsecurity.com'
+
 
 import os
 from distutils.core import setup, Command
@@ -72,6 +78,11 @@ try:
     setup(
         name = NAME,
         version = VERSION,
+        license = LICENSE,
+        description = DESCRIPTION,
+        url = URL,
+        author = AUTHOR,
+        author_email = AUTHOR_EMAIL,
         ext_modules = [ Extension('dnstable', ['dnstable.pyx'], **pkgconfig('libdnstable >= 0.9.0')) ],
         cmdclass = {'build_ext': build_ext, 'clean': Cleaner, 'test': Test}
     )
@@ -81,6 +92,11 @@ except ImportError:
         setup(
             name = NAME,
             version = VERSION,
+            license = LICENSE,
+            description = DESCRIPTION,
+            url = URL,
+            author = AUTHOR,
+            author_email = AUTHOR_EMAIL,
             ext_modules = [ Extension('dnstable', ['dnstable.c'], **pkgconfig('libdnstable >= 0.9.0')) ],
         )
     else:
