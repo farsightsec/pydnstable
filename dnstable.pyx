@@ -147,6 +147,13 @@ cdef class entry(object):
         free(res)
         return s
 
+    def to_json_rfc3339_time(self):
+        cdef char *res
+        res = dnstable_entry_to_json_time_form(self._instance, False)
+        s = res.decode('utf-8')
+        free(res)
+        return s
+
 @cython.internal
 cdef class iteritems(object):
     cdef dnstable_iter *_instance

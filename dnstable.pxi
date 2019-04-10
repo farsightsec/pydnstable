@@ -73,6 +73,7 @@ cdef extern from "dnstable.h" nogil:
     dnstable_res dnstable_entry_get_time_last(dnstable_entry *, uint64_t *)
     dnstable_res dnstable_entry_get_count(dnstable_entry *, uint64_t *)
     char * dnstable_entry_to_json(dnstable_entry *)
+    char * dnstable_entry_to_json_time_form(dnstable_entry *, bool)
     char * dnstable_entry_to_text(dnstable_entry *)
 
     # iter
