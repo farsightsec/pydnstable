@@ -14,7 +14,7 @@
 # limitations under the License.
 
 NAME = 'pydnstable'
-VERSION = '0.7.0'
+VERSION = '0.7.1'
 
 import os
 from distutils.core import setup, Command
