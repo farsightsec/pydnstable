@@ -34,9 +34,13 @@ class TestDNStable(unittest.TestCase):
         return False
 
     def run_query(self, q, expect):
+        gotsomething = False
         for i in self.r.query(q):
+            gotsomething = True
+            print(i)
             assert TestDNStable.cmp(expect, json.loads(i.to_json())), \
                 "expect-one-of: {}\ngot: {}".format(expect, i.to_json())
+        assert gotsomething, "Query returned no results"
 
     def test_query_rrset_fqdn(self):
         expect = [{"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"www.example.com.","rrtype":"A","bailiwick":"example.com.","rdata":["198.51.100.3","198.51.100.4"]},
