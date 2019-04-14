@@ -126,9 +126,9 @@ cdef class entry(object):
                 new_rdata_list.append(repr(wdns.rdata(rdata, wdns.CLASS_IN, self.d['rrtype'])))
             d['rdata'] = new_rdata_list
         if 'rrname' in d:
-            d['rrname'] = wdns.domain_to_str(d['rrname'])
+            d['rrname'] = wdns.domain_to_str(d['rrname'].encode('utf-8'))
         if 'bailiwick' in d:
-            d['bailiwick'] = wdns.domain_to_str(d['bailiwick'])
+            d['bailiwick'] = wdns.domain_to_str(d['bailiwick'].encode('utf-8'))
         if 'rrtype' in d:
             d['rrtype'] = wdns.rrtype_to_str(d['rrtype'])
         return d
