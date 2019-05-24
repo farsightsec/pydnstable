@@ -51,6 +51,14 @@ cdef extern from "dnstable.h" nogil:
         DNSTABLE_FILTER_PARAMETER_TIME_LAST_BEFORE
         DNSTABLE_FILTER_PARAMETER_TIME_LAST_AFTER
 
+    ctypedef enum dnstable_output_format_type:
+        dnstable_output_format_json
+        dnstable_output_format_text
+
+    ctypedef enum dnstable_date_format_type:
+        dnstable_date_format_unix
+        dnstable_date_format_rfc3339
+
     struct dnstable_entry:
         pass
     struct dnstable_iter:
@@ -58,6 +66,8 @@ cdef extern from "dnstable.h" nogil:
     struct dnstable_query:
         pass
     struct dnstable_reader:
+        pass
+    struct dnstable_formatter:
         pass
 
     # entry
@@ -74,6 +84,12 @@ cdef extern from "dnstable.h" nogil:
     dnstable_res dnstable_entry_get_count(dnstable_entry *, uint64_t *)
     char * dnstable_entry_to_json(dnstable_entry *)
     char * dnstable_entry_to_text(dnstable_entry *)
+    dnstable_formatter *dnstable_formatter_init()
+    void dnstable_formatter_destroy(dnstable_formatter **)
+    void dnstable_formatter_set_output_format(dnstable_formatter *, dnstable_output_format_type)
+    void dnstable_formatter_set_date_format(dnstable_formatter *, dnstable_date_format_type)
+    void dnstable_formatter_set_rdata_array(dnstable_formatter *, bool)
+    char *dnstable_entry_format(const dnstable_formatter *, const dnstable_entry *)
 
     # iter
     void dnstable_iter_destroy(dnstable_iter **)

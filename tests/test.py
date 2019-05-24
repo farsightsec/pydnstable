@@ -27,13 +27,17 @@ class TestDNStable(unittest.TestCase):
         assert cls.r is not None
 
     @classmethod
-    def cmp(cls, expectlist, got):
+    def cmp(cls, expectlist, gotlist):
+        '''Compare lists of dictionaries, insensitive to the order of the
+        lists.  All elements in expectlist must be identical to
+        gotlist.
+        '''
         for x in expectlist:
-            if not [k for k in x if x[k] != got[k]]:
+            if not [k for k in x if x[k] != gotlist[k]]:
                 return True
         return False
 
-    def run_query(self, q, expect):
+    def run_query_rdata_can_be_string(self, q, expect):
         gotsomething = False
         for i in self.r.query(q):
             gotsomething = True
@@ -41,70 +45,144 @@ class TestDNStable(unittest.TestCase):
                 "expect-one-of:\n    {}\ngot: {}".format(expect, i.to_json())
         assert gotsomething, "Query returned no results"
 
+    def run_query_rdata_always_array(self, q, expect):
+        gotsomething = False
+        for i in self.r.query(q):
+            gotsomething = True
+            assert TestDNStable.cmp(expect, json.loads(i.to_json(rdata_always_array = True))), \
+                "expect-one-of:\n    {}\ngot: {}".format(expect, i.to_json(rdata_always_array = True))
+        assert gotsomething, "Query returned no results"
+
+    def run_query_rfc3339_time(self, q, expect):
+        gotsomething = False
+        for i in self.r.query(q):
+            gotsomething = True
+            assert TestDNStable.cmp(expect, json.loads(i.to_json(rfc3339_time = True))), \
+                "expect-one-of:\n    {}\ngot: {}".format(expect, i.to_json(rfc3339_time = True))
+        assert gotsomething, "Query returned no results"
+
     def test_query_rrset_fqdn(self):
         expect = [{"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"www.example.com.","rrtype":"A","bailiwick":"example.com.","rdata":["198.51.100.3","198.51.100.4"]},
                   {"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"www.example.com.","rrtype":"AAAA","bailiwick":"example.com.","rdata":["2001:db8::1","2001:db8::2"]}]
         q = query(RRSET, 'www.example.com')
-        self.run_query(q, expect)
+        self.run_query_rdata_can_be_string(q, expect)
 
     def test_query_rrset_domain(self):
         expect = [{"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"example.com.","rrtype":"NS","bailiwick":"example.com.","rdata":["ns1.example.com.","ns2.example.com."]},
                   {"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"example.com.","rrtype":"SOA","bailiwick":"example.com.","rdata":["hidden-master.example.com. hostmaster.example.com. 2018032701 30 30 86400 300"]},
                   {"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"example.com.","rrtype":"MX","bailiwick":"example.com.","rdata":["10 mail.example.com.","20 mail2.example.com."]}]
         q = query(RRSET, 'example.com')
-        self.run_query(q, expect)
+        self.run_query_rdata_can_be_string(q, expect)
 
     def test_query_rrset_a(self):
         expect = [{"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"www.example.com.","rrtype":"A","bailiwick":"example.com.","rdata":["198.51.100.3","198.51.100.4"]}]
         q = query(RRSET, 'www.example.com', rrtype='A')
-        self.run_query(q, expect)
+        self.run_query_rdata_can_be_string(q, expect)
 
     def test_query_rrset_aaaa(self):
         expect = [{"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"www.example.com.","rrtype":"AAAA","bailiwick":"example.com.","rdata":["2001:db8::1","2001:db8::2"]}]
         q = query(RRSET, 'www.example.com', rrtype='AAAA')
-        self.run_query(q, expect)
+        self.run_query_rdata_can_be_string(q, expect)
 
     def test_query_rrset_ns(self):
         expect = [{"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"example.com.","rrtype":"NS","bailiwick":"example.com.","rdata":["ns1.example.com.","ns2.example.com."]}]
         q = query(RRSET, 'example.com', rrtype='NS')
-        self.run_query(q, expect)
+        self.run_query_rdata_can_be_string(q, expect)
 
     def test_query_rrset_soa(self):
         expect = [{"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"example.com.","rrtype":"SOA","bailiwick":"example.com.","rdata":["hidden-master.example.com. hostmaster.example.com. 2018032701 30 30 86400 300"]}]
         q = query(RRSET, 'example.com', rrtype='SOA')
-        self.run_query(q, expect)
+        self.run_query_rdata_can_be_string(q, expect)
 
     def test_query_rrset_mx(self):
         expect = [{"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"example.com.","rrtype":"MX","bailiwick":"example.com.","rdata":["10 mail.example.com.","20 mail2.example.com."]}]
         q = query(RRSET, 'example.com', rrtype='MX')
-        self.run_query(q, expect)
+        self.run_query_rdata_can_be_string(q, expect)
 
     def test_query_rrset_srv(self):
         expect = [{"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"_ldap._tcp.example.com.","rrtype":"SRV","bailiwick":"example.com.","rdata":["10 1 389 ldap.example.com."]}]
         q = query(RRSET, '_ldap._tcp.example.com', rrtype='SRV')
-        self.run_query(q, expect)
+        self.run_query_rdata_can_be_string(q, expect)
 
     def test_query_rrdata_ipv4(self):
-        expect = [{"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"www.example.com.","rrtype":"A","rdata":["198.51.100.3"]}]
+        expect = [{"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"www.example.com.","rrtype":"A","rdata":"198.51.100.3"}]
+        #expect = [{"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"www.example.com.","rrtype":"A","rdata":["198.51.100.3"]}]
         q = query(RDATA_IP, '198.51.100.3')
-        self.run_query(q, expect)
+        self.run_query_rdata_can_be_string(q, expect)
 
     def test_query_rrdata_ipv6(self):
-        expect = [{"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"www.example.com.","rrtype":"AAAA","rdata":["2001:db8::1"]}]
+        expect = [{"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"www.example.com.","rrtype":"AAAA","rdata":"2001:db8::1"}]
+        #expect = [{"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"www.example.com.","rrtype":"AAAA","rdata":["2001:db8::1"]}]
         q = query(RDATA_IP, '2001:db8::1')
-        self.run_query(q, expect)
+        self.run_query_rdata_can_be_string(q, expect)
 
     def test_query_rrdata_name_mx(self):
-        expect = [{"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"example.com.","rrtype":"MX","rdata":["10 mail.example.com."]}]
+        expect = [{"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"example.com.","rrtype":"MX","rdata":"10 mail.example.com."}]
+        #expect = [{"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"example.com.","rrtype":"MX","rdata":["10 mail.example.com."]}]
         q = query(RDATA_NAME, 'mail.example.com')
-        self.run_query(q, expect)
+        self.run_query_rdata_can_be_string(q, expect)
 
     def test_query_rrdata_name_ns(self):
-        expect = [{"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"example.com.","rrtype":"NS","rdata":["ns1.example.com."]}]
+        expect = [{"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"example.com.","rrtype":"NS","rdata":"ns1.example.com."}]
+        #expect = [{"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"example.com.","rrtype":"NS","rdata":["ns1.example.com."]}]
         q = query(RDATA_NAME, 'ns1.example.com')
-        self.run_query(q, expect)
+        self.run_query_rdata_can_be_string(q, expect)
 
     def test_query_rrdata_name_wc(self):
+        expect = [{"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"example.com.","rrtype":"NS","rdata":"ns1.example.com."},
+                  {"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"example.com.","rrtype":"NS","rdata":"ns2.example.com."},
+                  {"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"_ldap._tcp.example.com.","rrtype":"SRV","rdata":"10 1 389 ldap.example.com."},
+                  {"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"example.com.","rrtype":"MX","rdata":"10 mail.example.com."},
+                  {"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"example.com.","rrtype":"MX","rdata":"20 mail2.example.com."},
+                  {"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"example.com.","rrtype":"SOA","rdata":"hidden-master.example.com. hostmaster.example.com. 2018032701 30 30 86400 300"}]
+        # expect = [{"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"example.com.","rrtype":"NS","rdata":["ns1.example.com."]},
+        #           {"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"example.com.","rrtype":"NS","rdata":["ns2.example.com."]},
+        #           {"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"_ldap._tcp.example.com.","rrtype":"SRV","rdata":["10 1 389 ldap.example.com."]},
+        #           {"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"example.com.","rrtype":"MX","rdata":["10 mail.example.com."]},
+        #           {"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"example.com.","rrtype":"MX","rdata":["20 mail2.example.com."]},
+        #           {"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"example.com.","rrtype":"SOA","rdata":["hidden-master.example.com. hostmaster.example.com. 2018032701 30 30 86400 300"]}]
+        q = query(RDATA_NAME, '*.example.com')
+        self.run_query_rdata_can_be_string(q, expect)
+
+    def test_query_rrdata_name_soa(self):
+        expect = [{"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"example.com.","rrtype":"SOA","rdata":"hidden-master.example.com. hostmaster.example.com. 2018032701 30 30 86400 300"}]
+        #expect = [{"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"example.com.","rrtype":"SOA","rdata":["hidden-master.example.com. hostmaster.example.com. 2018032701 30 30 86400 300"]}]
+        q = query(RDATA_NAME, 'hidden-master.example.com', rrtype='SOA')
+        self.run_query_rdata_can_be_string(q, expect)
+
+    def test_query_rrdata_name_soa_wc(self):
+        expect = [{"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"example.com.","rrtype":"SOA","rdata":"hidden-master.example.com. hostmaster.example.com. 2018032701 30 30 86400 300"}]
+        #expect = [{"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"example.com.","rrtype":"SOA","rdata":["hidden-master.example.com. hostmaster.example.com. 2018032701 30 30 86400 300"]}]
+        q = query(RDATA_NAME, '*.example.com', rrtype='SOA')
+        self.run_query_rdata_can_be_string(q, expect)
+
+    def test_query_rrdata_name_ldap(self):
+        expect = [{"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"_ldap._tcp.example.com.","rrtype":"SRV","rdata":"10 1 389 ldap.example.com."}]
+        #expect = [{"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"_ldap._tcp.example.com.","rrtype":"SRV","rdata":["10 1 389 ldap.example.com."]}]
+        q = query(RDATA_NAME, 'ldap.example.com')
+        self.run_query_rdata_can_be_string(q, expect)
+
+    def test_rdata_always_array_query_rrdata_ipv4(self):
+        expect = [{"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"www.example.com.","rrtype":"A","rdata":["198.51.100.3"]}]
+        q = query(RDATA_IP, '198.51.100.3')
+        self.run_query_rdata_always_array(q, expect)
+
+    def test_rdata_always_array_query_rrdata_ipv6(self):
+        expect = [{"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"www.example.com.","rrtype":"AAAA","rdata":["2001:db8::1"]}]
+        q = query(RDATA_IP, '2001:db8::1')
+        self.run_query_rdata_always_array(q, expect)
+
+    def test_rdata_always_array_query_rrdata_name_mx(self):
+        expect = [{"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"example.com.","rrtype":"MX","rdata":["10 mail.example.com."]}]
+        q = query(RDATA_NAME, 'mail.example.com')
+        self.run_query_rdata_always_array(q, expect)
+
+    def test_rdata_always_array_query_rrdata_name_ns(self):
+        expect = [{"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"example.com.","rrtype":"NS","rdata":["ns1.example.com."]}]
+        q = query(RDATA_NAME, 'ns1.example.com')
+        self.run_query_rdata_always_array(q, expect)
+
+    def test_rdata_always_array_query_rrdata_name_wc(self):
         expect = [{"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"example.com.","rrtype":"NS","rdata":["ns1.example.com."]},
                   {"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"example.com.","rrtype":"NS","rdata":["ns2.example.com."]},
                   {"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"_ldap._tcp.example.com.","rrtype":"SRV","rdata":["10 1 389 ldap.example.com."]},
@@ -112,23 +190,27 @@ class TestDNStable(unittest.TestCase):
                   {"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"example.com.","rrtype":"MX","rdata":["20 mail2.example.com."]},
                   {"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"example.com.","rrtype":"SOA","rdata":["hidden-master.example.com. hostmaster.example.com. 2018032701 30 30 86400 300"]}]
         q = query(RDATA_NAME, '*.example.com')
-        self.run_query(q, expect)
+        self.run_query_rdata_always_array(q, expect)
 
-    def test_query_rrdata_name_soa(self):
+    def test_rdata_always_array_query_rrdata_name_soa(self):
         expect = [{"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"example.com.","rrtype":"SOA","rdata":["hidden-master.example.com. hostmaster.example.com. 2018032701 30 30 86400 300"]}]
         q = query(RDATA_NAME, 'hidden-master.example.com', rrtype='SOA')
-        self.run_query(q, expect)
+        self.run_query_rdata_always_array(q, expect)
 
-    def test_query_rrdata_name_soa_wc(self):
+    def test_rdata_always_array_query_rrdata_name_soa_wc(self):
         expect = [{"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"example.com.","rrtype":"SOA","rdata":["hidden-master.example.com. hostmaster.example.com. 2018032701 30 30 86400 300"]}]
         q = query(RDATA_NAME, '*.example.com', rrtype='SOA')
-        self.run_query(q, expect)
+        self.run_query_rdata_always_array(q, expect)
 
-    def test_query_rrdata_name_ldap(self):
+    def test_rdata_always_array_query_rrdata_name_ldap(self):
         expect = [{"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"_ldap._tcp.example.com.","rrtype":"SRV","rdata":["10 1 389 ldap.example.com."]}]
         q = query(RDATA_NAME, 'ldap.example.com')
-        self.run_query(q, expect)
+        self.run_query_rdata_always_array(q, expect)
 
+    def test_formatter_json_rfc3339(self):
+        expect = [{"count":1,"time_first":"2018-03-27T10:43:28Z","time_last":"2018-03-27T10:43:28Z","rrname":"example.com.","rrtype":"SOA","rdata":"hidden-master.example.com. hostmaster.example.com. 2018032701 30 30 86400 300"}]
+        q = query(RDATA_NAME, '*.example.com', rrtype='SOA')
+        self.run_query_rfc3339_time(q, expect)
 
 if __name__ == '__main__':
     unittest.main()
