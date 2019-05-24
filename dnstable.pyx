@@ -140,12 +140,31 @@ cdef class entry(object):
         free(res)
         return s
 
-    def to_json(self):
+    def to_json(self, rfc3339_time = False, rdata_always_array = False):
         cdef char *res
-        res = dnstable_entry_to_json(self._instance)
-        s = res.decode('utf-8')
-        free(res)
-        return s
+        cdef dnstable_formatter *f
+
+        if not rfc3339_time and not rdata_always_array:
+            # for typical case, use simply C function
+            res = dnstable_entry_to_json(self._instance)
+            s = res.decode('utf-8')
+            free(res)
+            return s
+        else:
+            # create and destroy the formatter each time
+            f = dnstable_formatter_init()
+            dnstable_formatter_set_output_format(f, dnstable_output_format_json)
+            if rfc3339_time:
+                dnstable_formatter_set_date_format(f, dnstable_date_format_rfc3339)
+            else:
+                dnstable_formatter_set_date_format(f, dnstable_date_format_unix)
+            dnstable_formatter_set_rdata_array(f, rdata_always_array)
+
+            res = dnstable_entry_format(f, self._instance)
+            s = res.decode('utf-8')
+            free(res)
+            dnstable_formatter_destroy(&f)
+            return s
 
 @cython.internal
 cdef class iteritems(object):
