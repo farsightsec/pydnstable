@@ -212,7 +212,7 @@ cdef class query(object):
     def __cinit__(self):
         self._instance = NULL
 
-    def __init__(self, qtype, str data, str rrtype=None, str bailiwick=None, time_first_before=None, time_first_after=None, time_last_before=None, time_last_after=None, timeout=None, aggregate=True, int skip=0):
+    def __init__(self, qtype, str data, str rrtype=None, str bailiwick=None, time_first_before=None, time_first_after=None, time_last_before=None, time_last_after=None, timeout=None, aggregate=True, uint64_t skip=0):
         cdef dnstable_res
         cdef timespec ts
         cdef uint64_t tm
@@ -236,7 +236,7 @@ cdef class query(object):
                 raise DnstableException, 'dnstable_query_set_rrtype() failed: %s' % dnstable_query_get_error(self._instance)
 
         if skip != 0:
-            res = dnstable_query_set_skip(self._instance, int(skip))
+            res = dnstable_query_set_skip(self._instance, skip)
             if res != dnstable_res_success:
                 raise DnstableException, 'dnstable_query_set_skip() failed: %s' % dnstable_query_get_error(self._instance)
 
