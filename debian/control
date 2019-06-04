@@ -9,8 +9,9 @@ Build-Depends:
  libdnstable-dev (>= 0.11.0),
  pkg-config,
  python-all-dev (>= 2.6.6-3~),
-Standards-Version: 3.9.6
-X-Python-Version: 2.7
+ python3-all-dev,
+Standards-Version: 3.9.8
+X-Python3-Version: >= 3.5
 
 Package: python-dnstable
 Architecture: any
@@ -30,4 +31,24 @@ Description: passive DNS encoding format library (Python bindings)
  libmtbl provides fast lookups of partial keys, so the precise encoding of
  dnstable records is optimized to take advantage of this property.
  .
- This package contains the Python extension module for libdnstable.
+ This package contains the Python 2 extension module for libdnstable.
+
+Package: python3-dnstable
+Architecture: any
+Depends: ${misc:Depends}, ${python3:Depends}, ${shlibs:Depends}
+Description: passive DNS encoding format library (Python bindings)
+ dnstable implements an encoding format for passive DNS data. It consists of a
+ C library, libdnstable, and several command line utilities for creating,
+ querying, and merging dnstable data files.
+ .
+ It stores key-value records in Sorted String Table (SSTable) files and
+ provides high-level interfaces for querying or iterating over the stored
+ records.  dnstable encodes individual records using a format tailored for
+ efficiently storing passive DNS data and can quickly perform both "forward"
+ and "inverse" searches.
+ .
+ dnstable relies on libmtbl for the actual storage of passive DNS records.
+ libmtbl provides fast lookups of partial keys, so the precise encoding of
+ dnstable records is optimized to take advantage of this property.
+ .
+ This package contains the Python 3 extension module for libdnstable.

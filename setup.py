@@ -45,7 +45,7 @@ class Cleaner(clean):
             clean.run(self)
             for i in ["dnstable.c"]:
                 if os.path.isfile(i):
-                    print "Cleaning ", i
+                    print("Cleaning ", i)
                     os.unlink(i)
 
 def pkgconfig(*packages, **kw):
