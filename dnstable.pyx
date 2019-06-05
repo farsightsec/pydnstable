@@ -1,4 +1,18 @@
 #cython: embedsignature=True
+#cython: language_level=2
+# Copyright (c) 2015-2019 by Farsight Security, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 include "dnstable.pxi"
 
@@ -33,7 +47,7 @@ cdef class entry(object):
         cdef dnstable_res res
         cdef uint16_t u16
         cdef uint64_t u64
-        cdef uint8_t *data
+        cdef const uint8_t *data
         cdef size_t len_data
         cdef size_t sz
         cdef size_t i
@@ -47,7 +61,7 @@ cdef class entry(object):
         # rrname
         res = dnstable_entry_get_rrname(ent, &data, &len_data)
         if res == dnstable_res_success:
-            self.d['rrname'] = PyString_FromStringAndSize(<char *> data, len_data)
+            self.d['rrname'] = data[:len_data]
 
         # rrtype
         res = dnstable_entry_get_rrtype(ent, &u16)
@@ -83,16 +97,17 @@ cdef class entry(object):
                 res = dnstable_entry_get_rdata(ent, i, &data, &len_data)
                 if res != dnstable_res_success:
                     raise DnstableException, 'dnstable_entry_get_rdata() failed'
-                self.d['rdata'].append(PyString_FromStringAndSize(<char *> data, len_data))
+                self.d['rdata'].append(data[:len_data])
 
         if self.etype == DNSTABLE_ENTRY_TYPE_RRSET:
             # bailiwick
             res = dnstable_entry_get_bailiwick(ent, &data, &len_data)
             if res == dnstable_res_success:
-                self.d['bailiwick'] = PyString_FromStringAndSize(<char *> data, len_data)
+                self.d['bailiwick'] = data[:len_data].decode('utf-8')
 
         if iszone:
             dnstable_entry_set_iszone(ent, iszone)
+
         self._instance = ent
 
     def __repr__(self):
@@ -111,9 +126,9 @@ cdef class entry(object):
                 new_rdata_list.append(repr(wdns.rdata(rdata, wdns.CLASS_IN, self.d['rrtype'])))
             d['rdata'] = new_rdata_list
         if 'rrname' in d:
-            d['rrname'] = wdns.domain_to_str(d['rrname'])
+            d['rrname'] = wdns.domain_to_str(d['rrname'].encode('utf-8'))
         if 'bailiwick' in d:
-            d['bailiwick'] = wdns.domain_to_str(d['bailiwick'])
+            d['bailiwick'] = wdns.domain_to_str(d['bailiwick'].encode('utf-8'))
         if 'rrtype' in d:
             d['rrtype'] = wdns.rrtype_to_str(d['rrtype'])
         return d
@@ -121,16 +136,35 @@ cdef class entry(object):
     def to_text(self):
         cdef char *res
         res = dnstable_entry_to_text(self._instance)
-        s = PyString_FromString(res)
+        s = res.decode('utf-8')
         free(res)
         return s
 
-    def to_json(self):
+    def to_json(self, rfc3339_time = False, rdata_always_array = False):
         cdef char *res
-        res = dnstable_entry_to_json(self._instance)
-        s = PyString_FromString(res)
-        free(res)
-        return s
+        cdef dnstable_formatter *f
+
+        if not rfc3339_time and not rdata_always_array:
+            # for typical case, use simply C function
+            res = dnstable_entry_to_json(self._instance)
+            s = res.decode('utf-8')
+            free(res)
+            return s
+        else:
+            # create and destroy the formatter each time
+            f = dnstable_formatter_init()
+            dnstable_formatter_set_output_format(f, dnstable_output_format_json)
+            if rfc3339_time:
+                dnstable_formatter_set_date_format(f, dnstable_date_format_rfc3339)
+            else:
+                dnstable_formatter_set_date_format(f, dnstable_date_format_unix)
+            dnstable_formatter_set_rdata_array(f, rdata_always_array)
+
+            res = dnstable_entry_format(f, self._instance)
+            s = res.decode('utf-8')
+            free(res)
+            dnstable_formatter_destroy(&f)
+            return s
 
 @cython.internal
 cdef class iteritems(object):
@@ -158,10 +192,12 @@ cdef class iteritems(object):
             raise StopIteration
 
         res = dnstable_iter_next(self._instance, &ent)
+
         if res == dnstable_res_failure:
             raise StopIteration
         elif res == dnstable_res_timeout:
             raise Timeout
+
         d = entry()
         d.from_c(ent, self.iszone)
         return d
@@ -176,7 +212,7 @@ cdef class query(object):
     def __cinit__(self):
         self._instance = NULL
 
-    def __init__(self, qtype, str data, str rrtype=None, str bailiwick=None, time_first_before=None, time_first_after=None, time_last_before=None, time_last_after=None, timeout=None):
+    def __init__(self, qtype, str data, str rrtype=None, str bailiwick=None, time_first_before=None, time_first_after=None, time_last_before=None, time_last_after=None, timeout=None, aggregate=True, uint64_t skip=0):
         cdef dnstable_res
         cdef timespec ts
         cdef uint64_t tm
@@ -190,17 +226,26 @@ cdef class query(object):
         self._instance = dnstable_query_init(qtype)
         self.qtype = qtype
 
-        res = dnstable_query_set_data(self._instance, PyString_AsString(data))
+        res = dnstable_query_set_data(self._instance, data.encode('UTF-8'))
         if res != dnstable_res_success:
             raise DnstableException, 'dnstable_query_set_data() failed: %s' % dnstable_query_get_error(self._instance)
 
         if rrtype:
-            res = dnstable_query_set_rrtype(self._instance, PyString_AsString(rrtype))
+            res = dnstable_query_set_rrtype(self._instance, rrtype.encode('UTF-8'))
             if res != dnstable_res_success:
                 raise DnstableException, 'dnstable_query_set_rrtype() failed: %s' % dnstable_query_get_error(self._instance)
 
+        if skip != 0:
+            res = dnstable_query_set_skip(self._instance, skip)
+            if res != dnstable_res_success:
+                raise DnstableException, 'dnstable_query_set_skip() failed: %s' % dnstable_query_get_error(self._instance)
+
+        res = dnstable_query_set_aggregated(self._instance, aggregate)
+        if res != dnstable_res_success:
+            raise DnstableException, 'dnstable_query_set_aggregated() failed: %s' % dnstable_query_get_error(self._instance)
+
         if qtype == RRSET and bailiwick:
-            res = dnstable_query_set_bailiwick(self._instance, PyString_AsString(bailiwick))
+            res = dnstable_query_set_bailiwick(self._instance, bailiwick.encode('UTF-8'))
             if res != dnstable_res_success:
                 raise DnstableException, 'dnstable_query_set_bailiwick() failed: %s' % dnstable_query_get_error(self._instance)
 
@@ -286,11 +331,11 @@ cdef class reader(object):
     def __dealloc__(self):
         dnstable_reader_destroy(&self._instance)
 
-    def __init__(self, bytes fname, iszone=False):
+    def __init__(self, str fname, iszone=False):
         import os
-        if not os.path.isfile(fname):
+        if not os.path.isfile(fname.encode('UTF-8')):
             raise DnstableException, 'cannot open file %s' % fname
-        self._instance = dnstable_reader_init_setfile(PyString_AsString(fname))
+        self._instance = dnstable_reader_init_setfile(fname.encode('UTF-8'))
         self.iszone = iszone
 
     def reload(self):
@@ -298,6 +343,7 @@ cdef class reader(object):
 
     def query(self, query q):
         it = iteritems(self.iszone)
+
         it._instance = dnstable_reader_query(self._instance, q._instance)
         it.q = q
         return it

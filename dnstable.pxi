@@ -1,5 +1,20 @@
+#cython: embedsignature=True
+# Copyright (c) 2015-2019 by Farsight Security, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 cimport cython
-from cpython cimport bool
+from libcpp cimport bool
 from cpython.string cimport *
 from libc.stddef cimport *
 from libc.stdint cimport *
@@ -12,7 +27,7 @@ cdef extern from "sys/time.h" nogil:
         time_t tv_sec
         long   tv_nsec
 
-cdef extern from "dnstable.h":
+cdef extern from "dnstable.h" nogil:
     ctypedef enum dnstable_res:
         dnstable_res_failure
         dnstable_res_success
@@ -36,6 +51,14 @@ cdef extern from "dnstable.h":
         DNSTABLE_FILTER_PARAMETER_TIME_LAST_BEFORE
         DNSTABLE_FILTER_PARAMETER_TIME_LAST_AFTER
 
+    ctypedef enum dnstable_output_format_type:
+        dnstable_output_format_json
+        dnstable_output_format_text
+
+    ctypedef enum dnstable_date_format_type:
+        dnstable_date_format_unix
+        dnstable_date_format_rfc3339
+
     struct dnstable_entry:
         pass
     struct dnstable_iter:
@@ -43,6 +66,8 @@ cdef extern from "dnstable.h":
     struct dnstable_query:
         pass
     struct dnstable_reader:
+        pass
+    struct dnstable_formatter:
         pass
 
     # entry
@@ -59,6 +84,12 @@ cdef extern from "dnstable.h":
     dnstable_res dnstable_entry_get_count(dnstable_entry *, uint64_t *)
     char * dnstable_entry_to_json(dnstable_entry *)
     char * dnstable_entry_to_text(dnstable_entry *)
+    dnstable_formatter *dnstable_formatter_init()
+    void dnstable_formatter_destroy(dnstable_formatter **)
+    void dnstable_formatter_set_output_format(dnstable_formatter *, dnstable_output_format_type)
+    void dnstable_formatter_set_date_format(dnstable_formatter *, dnstable_date_format_type)
+    void dnstable_formatter_set_rdata_array(dnstable_formatter *, bool)
+    char *dnstable_entry_format(const dnstable_formatter *, const dnstable_entry *)
 
     # iter
     void dnstable_iter_destroy(dnstable_iter **)
@@ -70,6 +101,9 @@ cdef extern from "dnstable.h":
     char * dnstable_query_get_error(dnstable_query *)
     dnstable_res dnstable_query_set_data(dnstable_query *, char *)
     dnstable_res dnstable_query_set_rrtype(dnstable_query *, char *)
+    dnstable_res dnstable_query_set_skip(dnstable_query *, uint64_t)
+    dnstable_res dnstable_query_set_aggregated(dnstable_query *, bool)
+    bool dnstable_query_is_aggregated(const dnstable_query *)
     dnstable_res dnstable_query_set_bailiwick(dnstable_query *, char *)
     dnstable_res dnstable_query_set_timeout(dnstable_query *, timespec *)
     dnstable_res dnstable_query_set_filter_parameter(dnstable_query *, dnstable_filter_parameter_type, void *, size_t)

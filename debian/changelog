@@ -1,3 +1,10 @@
+pydnstable (0.7.0-1) debian-farsightsec; urgency=medium
+
+  * Python3 support.
+  * Add new query parameters 'aggregate' and 'skip'.
+
+ -- Farsight Security, Inc. <software@farsightsecurity.com>  Fri, 29 Mar 2019 15:55:10 -0500
+
 pydnstable (0.6.1-1) debian-farsightsec; urgency=medium
 
   * Fix bug with negative epoch times. Add try/except around time
