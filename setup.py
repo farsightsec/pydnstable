@@ -14,7 +14,7 @@
 # limitations under the License.
 
 NAME = 'pydnstable'
-VERSION = '0.7.0'
+VERSION = '0.7.1'
 LICENSE = 'Apache License 2.0'
 DESCRIPTION = 'Python extension module for the dnstable C library'
 URL = 'https://github.com/farsightsec/pydnstable'
