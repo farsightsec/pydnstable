@@ -18,7 +18,8 @@ X-Python3-Version: >= 3.5
 
 Package: python-dnstable
 Architecture: any
-Depends: ${misc:Depends}, ${python:Depends}, ${shlibs:Depends}
+Depends: ${misc:Depends}, ${python:Depends}, ${shlibs:Depends},
+ libdnstable0 (>= 0.11.2)
 Description: passive DNS encoding format library (Python bindings)
  dnstable implements an encoding format for passive DNS data. It consists of a
  C library, libdnstable, and several command line utilities for creating,
@@ -38,7 +39,8 @@ Description: passive DNS encoding format library (Python bindings)
 
 Package: python3-dnstable
 Architecture: any
-Depends: ${misc:Depends}, ${python3:Depends}, ${shlibs:Depends}
+Depends: ${misc:Depends}, ${python3:Depends}, ${shlibs:Depends},
+ libdnstable0 (>= 0.11.2)
 Description: passive DNS encoding format library (Python bindings)
  dnstable implements an encoding format for passive DNS data. It consists of a
  C library, libdnstable, and several command line utilities for creating,
