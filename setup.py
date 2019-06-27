@@ -83,7 +83,7 @@ try:
         url = URL,
         author = AUTHOR,
         author_email = AUTHOR_EMAIL,
-        ext_modules = [ Extension('dnstable', ['dnstable.pyx'], **pkgconfig('libdnstable >= 0.11.0')) ],
+        ext_modules = [ Extension('dnstable', ['dnstable.pyx'], **pkgconfig('libdnstable >= 0.11.2')) ],
         cmdclass = {'build_ext': build_ext, 'clean': Cleaner, 'test': Test}
     )
 except ImportError:
