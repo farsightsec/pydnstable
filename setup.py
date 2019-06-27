@@ -14,7 +14,7 @@
 # limitations under the License.
 
 NAME = 'pydnstable'
-VERSION = '0.7.1'
+VERSION = '0.7.2'
 LICENSE = 'Apache License 2.0'
 DESCRIPTION = 'Python extension module for the dnstable C library'
 URL = 'https://github.com/farsightsec/pydnstable'
@@ -83,7 +83,7 @@ try:
         url = URL,
         author = AUTHOR,
         author_email = AUTHOR_EMAIL,
-        ext_modules = [ Extension('dnstable', ['dnstable.pyx'], **pkgconfig('libdnstable >= 0.11.0')) ],
+        ext_modules = [ Extension('dnstable', ['dnstable.pyx'], **pkgconfig('libdnstable >= 0.11.2')) ],
         cmdclass = {'build_ext': build_ext, 'clean': Cleaner, 'test': Test}
     )
 except ImportError:

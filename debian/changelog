@@ -1,6 +1,12 @@
+pydnstable (0.7.2-1) debian-farsightsec; urgency=medium
+
+  * Require dnstable >= 0.11.2
+
+ -- Farsight Security, Inc. <software@farsightsecurity.com>  Wed, 26 Jun 2019 20:42:00 -0500
+
 pydnstable (0.7.1-1) debian-farsightsec; urgency=medium
 
-  * Change dnstable_query_set_skip to ..._offset. 
+  * Change dnstable_query_set_skip to ..._offset.
 
  -- Farsight Security, Inc. <software@farsightsecurity.com>  Fri, 14 Jun 2019 15:01:00 -0500
 
