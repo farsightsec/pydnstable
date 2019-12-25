@@ -250,7 +250,7 @@ cdef class query(object):
                 raise DnstableException, 'dnstable_query_set_bailiwick() failed: %s' % dnstable_query_get_error(self._instance)
 
         if timeout:
-            timeout=float(timeout)
+            timeout = float(timeout)
             if timeout < 0:
                 raise ValueError('timeout ({}) is not a positive number'.format(timeout))
             ts.tv_sec = math.trunc(timeout)
@@ -263,7 +263,7 @@ cdef class query(object):
             try:
                 tm = time_first_before
             except OverflowError:
-                raise DnstableException, 'dnstable_query_set_timeout() failed: overflow error converting %s' % (time_first_before)
+                raise DnstableException, 'overflow error converting time_first_before %s' % (time_first_before)
             res = dnstable_query_set_filter_parameter(self._instance,
                     DNSTABLE_FILTER_PARAMETER_TIME_FIRST_BEFORE, &tm, 8)
             if res != dnstable_res_success:
@@ -273,7 +273,7 @@ cdef class query(object):
             try:
                 tm = time_first_after
             except OverflowError:
-                raise DnstableException, 'dnstable_query_set_timeout() failed: overflow error converting %s' % (time_first_after)
+                raise DnstableException, 'overflow error converting time_first_after %s' % (time_first_after)
             res = dnstable_query_set_filter_parameter(self._instance,
                     DNSTABLE_FILTER_PARAMETER_TIME_FIRST_AFTER, &tm, 8)
             if res != dnstable_res_success:
@@ -283,7 +283,7 @@ cdef class query(object):
             try:
                 tm = time_last_before
             except OverflowError:
-                raise DnstableException, 'dnstable_query_set_timeout() failed: overflow error converting %s' % (time_last_before)
+                raise DnstableException, 'overflow error converting time_last_before %s' % (time_last_before)
             res = dnstable_query_set_filter_parameter(self._instance,
                     DNSTABLE_FILTER_PARAMETER_TIME_LAST_BEFORE, &tm, 8)
             if res != dnstable_res_success:
@@ -293,7 +293,7 @@ cdef class query(object):
             try:
                 tm = time_last_after
             except OverflowError:
-                raise DnstableException, 'dnstable_query_set_timeout() failed: overflow error converting %s' % (time_last_after)
+                raise DnstableException, 'overflow error converting time_last_after %s' % (time_last_after)
             res = dnstable_query_set_filter_parameter(self._instance,
                     DNSTABLE_FILTER_PARAMETER_TIME_LAST_AFTER, &tm, 8)
             if res != dnstable_res_success:
