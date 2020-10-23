@@ -17,11 +17,14 @@
 include "dnstable.pxi"
 
 import math
+from libc.stdint cimport uintptr_t
 
 RRSET = DNSTABLE_QUERY_TYPE_RRSET
 RDATA_IP = DNSTABLE_QUERY_TYPE_RDATA_IP
 RDATA_RAW = DNSTABLE_QUERY_TYPE_RDATA_RAW
 RDATA_NAME = DNSTABLE_QUERY_TYPE_RDATA_NAME
+
+DEBUG = False
 
 class DnstableException(Exception):
     pass
@@ -38,7 +41,12 @@ cdef class entry(object):
         self._instance = NULL
 
     def __dealloc__(self):
-        dnstable_entry_destroy(&self._instance)
+        cdef uintptr_t XX = <uintptr_t> (self._instance)
+        if DEBUG:
+            print("dealloc entry ", hex(XX))
+        if self._instance != NULL:
+            dnstable_entry_destroy(&(self._instance))
+            self._instance = NULL
 
     def __init__(self):
         pass
@@ -109,6 +117,10 @@ cdef class entry(object):
             dnstable_entry_set_iszone(ent, iszone)
 
         self._instance = ent
+        cdef uintptr_t XX = <uintptr_t> (ent)
+        if DEBUG:
+            print("  alloc entry ", hex(XX))
+
 
     def __repr__(self):
         return self.to_text()
@@ -178,7 +190,12 @@ cdef class iteritems(object):
         self.iszone = iszone
 
     def __dealloc__(self):
-        dnstable_iter_destroy(&self._instance)
+        cdef uintptr_t XX = <uintptr_t> (self._instance)
+        if DEBUG:
+            print("dealloc iter ", hex(XX))
+        if  self._instance != NULL:
+            dnstable_iter_destroy(&(self._instance))
+            self._instance = NULL
 
     def __iter__(self):
         return self
@@ -224,6 +241,10 @@ cdef class query(object):
             raise DnstableException, 'invalid qtype'
         self._instance = dnstable_query_init(qtype)
         self.qtype = qtype
+
+        cdef uintptr_t XX = <uintptr_t> (self._instance)
+        if DEBUG:
+            print("  alloc query ", hex(XX))
 
         res = dnstable_query_set_data(self._instance, data.encode('UTF-8'))
         if res != dnstable_res_success:
@@ -299,7 +320,12 @@ cdef class query(object):
                 raise DnstableException, 'dnstable_query_set_filter_parameter(time_last_after) failed'
 
     def __dealloc__(self):
-        dnstable_query_destroy(&self._instance)
+        cdef uintptr_t XX = <uintptr_t> (self._instance)
+        if DEBUG:
+            print("dealloc query ", hex(XX))
+        if self._instance != NULL:
+            dnstable_query_destroy(&self._instance)
+            self._instance = NULL
 
     def __repr__(self):
         if self.qtype == RDATA_IP:
@@ -328,13 +354,21 @@ cdef class reader(object):
         self._instance = NULL
 
     def __dealloc__(self):
-        dnstable_reader_destroy(&self._instance)
+        cdef uintptr_t XX = <uintptr_t> (self._instance)
+        if DEBUG:
+            print("dealloc reader ", hex(XX))
+        if self._instance != NULL:
+            dnstable_reader_destroy(&self._instance)
+            self._instance = NULL
 
     def __init__(self, str fname, iszone=False):
         import os
         if not os.path.isfile(fname.encode('UTF-8')):
             raise DnstableException, 'cannot open file %s' % fname
         self._instance = dnstable_reader_init_setfile(fname.encode('UTF-8'))
+        cdef uintptr_t XX = <uintptr_t> (self._instance)
+        if DEBUG:
+            print("  alloc reader ", hex(XX))
         self.iszone = iszone
 
     def reload(self):
@@ -344,4 +378,7 @@ cdef class reader(object):
         it = iteritems(self.iszone)
 
         it._instance = dnstable_reader_query(self._instance, q._instance)
+        cdef uintptr_t XX = <uintptr_t> (it._instance)
+        if DEBUG:
+            print("  alloc iter ", hex(XX))
         return it
