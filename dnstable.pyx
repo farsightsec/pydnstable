@@ -170,7 +170,6 @@ cdef class entry(object):
 cdef class iteritems(object):
     cdef dnstable_iter *_instance
     cdef object iszone
-    cdef object q
 
     def __cinit__(self):
         self._instance = NULL
@@ -345,5 +344,4 @@ cdef class reader(object):
         it = iteritems(self.iszone)
 
         it._instance = dnstable_reader_query(self._instance, q._instance)
-        it.q = q
         return it
