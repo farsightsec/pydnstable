@@ -1,3 +1,9 @@
+pydnstable (0.7.2-2) debian-farsightsec; urgency=medium
+
+  * Deprecate Python2 package.
+
+ -- Farsight Security, Inc. <software@farsightsecurity.com>  Wed, 09 Feb 2022 20:06:53 +0000
+
 pydnstable (0.7.2-1) debian-farsightsec; urgency=medium
 
   * Require dnstable >= 0.11.2
