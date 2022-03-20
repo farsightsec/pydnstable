@@ -103,7 +103,7 @@ cdef class entry(object):
             # bailiwick
             res = dnstable_entry_get_bailiwick(ent, &data, &len_data)
             if res == dnstable_res_success:
-                self.d['bailiwick'] = data[:len_data].decode('utf-8')
+                self.d['bailiwick'] = data[:len_data]
 
         if iszone:
             dnstable_entry_set_iszone(ent, iszone)
@@ -126,9 +126,9 @@ cdef class entry(object):
                 new_rdata_list.append(repr(wdns.rdata(rdata, wdns.CLASS_IN, self.d['rrtype'])))
             d['rdata'] = new_rdata_list
         if 'rrname' in d:
-            d['rrname'] = wdns.domain_to_str(d['rrname'].encode('utf-8'))
+            d['rrname'] = wdns.domain_to_str(d['rrname'])
         if 'bailiwick' in d:
-            d['bailiwick'] = wdns.domain_to_str(d['bailiwick'].encode('utf-8'))
+            d['bailiwick'] = wdns.domain_to_str(d['bailiwick'])
         if 'rrtype' in d:
             d['rrtype'] = wdns.rrtype_to_str(d['rrtype'])
         return d

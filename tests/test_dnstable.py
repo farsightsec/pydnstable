@@ -199,5 +199,31 @@ class TestDNStable(unittest.TestCase):
         q = query(RDATA_NAME, '*.example.com', rrtype='SOA')
         self.run_query_rfc3339_time(q, expect)
 
+    def run_query_fmt_dict(self, q, expect):
+        gotsomething = False
+        for i in self.r.query(q):
+            gotsomething = True
+            assert expect == i.to_fmt_dict(), \
+                "expecting:\n    {}\ngot: {}".format(expect, i.to_fmt_dict())
+        assert gotsomething, "Query returned no results"
+
+    def test_formatter_fmt_dict(self):
+        expect = {'rrname': 'example.com.', 'rrtype': 'SOA', 'count': 1, 'time_first': 1522147408, 'time_last': 1522147408, 'rdata': ['hidden-master.example.com. hostmaster.example.com. 2018032701 30 30 86400 300']}
+        q = query(RDATA_NAME, '*.example.com', rrtype='SOA')
+        self.run_query_fmt_dict(q, expect)
+
+    def run_query_text(self, q, expect):
+        gotsomething = False
+        for i in self.r.query(q):
+            gotsomething = True
+            assert expect == i.to_text(), \
+                "expecting:\n    '{}'\ngot: '{}'".format(expect, i.to_text())
+        assert gotsomething, "Query returned no results"
+
+    def test_formatter_text(self):
+        expect = "example.com. IN SOA hidden-master.example.com. hostmaster.example.com. 2018032701 30 30 86400 300\n"
+        q = query(RDATA_NAME, '*.example.com', rrtype='SOA')
+        self.run_query_text(q, expect)
+
 if __name__ == '__main__':
     unittest.main()
