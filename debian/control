@@ -10,6 +10,7 @@ Build-Depends:
  pkg-config,
  python3-all-dev,
  python3-pytest,
+ python3-wdns,
 Standards-Version: 3.9.8
 X-Python3-Version: >= 3.5
 
