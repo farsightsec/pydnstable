@@ -136,7 +136,7 @@ cdef class entry(object):
     def to_text(self):
         cdef char *res
         res = dnstable_entry_to_text(self._instance)
-        s = res.decode('utf-8')
+        s = res.decode('utf-8', errors='ignore')
         free(res)
         return s
 
@@ -147,7 +147,7 @@ cdef class entry(object):
         if not rfc3339_time and not rdata_always_array:
             # for typical case, use simply C function
             res = dnstable_entry_to_json(self._instance)
-            s = res.decode('utf-8')
+            s = res.decode('utf-8', errors='ignore')
             free(res)
             return s
         else:
@@ -161,7 +161,7 @@ cdef class entry(object):
             dnstable_formatter_set_rdata_array(f, rdata_always_array)
 
             res = dnstable_entry_format(f, self._instance)
-            s = res.decode('utf-8')
+            s = res.decode('utf-8', errors='ignore')
             free(res)
             dnstable_formatter_destroy(&f)
             return s
@@ -226,12 +226,12 @@ cdef class query(object):
         self._instance = dnstable_query_init(qtype)
         self.qtype = qtype
 
-        res = dnstable_query_set_data(self._instance, data.encode('UTF-8'))
+        res = dnstable_query_set_data(self._instance, data.encode('UTF-8', errors='backslashreplace'))
         if res != dnstable_res_success:
             raise DnstableException, 'dnstable_query_set_data() failed: %s' % dnstable_query_get_error(self._instance)
 
         if rrtype:
-            res = dnstable_query_set_rrtype(self._instance, rrtype.encode('UTF-8'))
+            res = dnstable_query_set_rrtype(self._instance, rrtype.encode('UTF-8', errors='backslashreplace'))
             if res != dnstable_res_success:
                 raise DnstableException, 'dnstable_query_set_rrtype() failed: %s' % dnstable_query_get_error(self._instance)
 
@@ -245,7 +245,7 @@ cdef class query(object):
             raise DnstableException, 'dnstable_query_set_aggregated() failed: %s' % dnstable_query_get_error(self._instance)
 
         if qtype == RRSET and bailiwick:
-            res = dnstable_query_set_bailiwick(self._instance, bailiwick.encode('UTF-8'))
+            res = dnstable_query_set_bailiwick(self._instance, bailiwick.encode('UTF-8', errors='backslashreplace'))
             if res != dnstable_res_success:
                 raise DnstableException, 'dnstable_query_set_bailiwick() failed: %s' % dnstable_query_get_error(self._instance)
 
@@ -333,9 +333,9 @@ cdef class reader(object):
 
     def __init__(self, str fname, iszone=False):
         import os
-        if not os.path.isfile(fname.encode('UTF-8')):
+        if not os.path.isfile(fname.encode('UTF-8', errors='backslashreplace')):
             raise DnstableException, 'cannot open file %s' % fname
-        self._instance = dnstable_reader_init_setfile(fname.encode('UTF-8'))
+        self._instance = dnstable_reader_init_setfile(fname.encode('UTF-8', errors='backslashreplace'))
         self.iszone = iszone
 
     def reload(self):
