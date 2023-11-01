@@ -218,12 +218,23 @@ class TestDNStable(unittest.TestCase):
             gotsomething = True
             assert expect == i.to_text(), \
                 "expecting:\n    '{}'\ngot: '{}'".format(expect, i.to_text())
-        assert gotsomething, "Query returned no results"
+        if expect != "":
+            assert gotsomething, "Query returned no results"
+        else:
+            assert gotsomething == False, "Query results not expected"
 
     def test_formatter_text(self):
         expect = "example.com. IN SOA hidden-master.example.com. hostmaster.example.com. 2018032701 30 30 86400 300\n"
         q = query(RDATA_NAME, '*.example.com', rrtype='SOA')
         self.run_query_text(q, expect)
+
+    def test_query_casesensitive(self):
+        expect1 = "example.com. IN SOA hidden-master.example.com. hostmaster.example.com. 2018032701 30 30 86400 300\n"
+        expect2 = ""
+        q1 = query(RDATA_NAME, '*.EXAMPLE.COM', rrtype='SOA', case_sensitive=False)
+        q2 = query(RDATA_NAME, '*.EXAMPLE.COM', rrtype='SOA', case_sensitive=True)
+        self.run_query_text(q1, expect1)
+        self.run_query_text(q2, expect2)
 
 if __name__ == '__main__':
     unittest.main()
