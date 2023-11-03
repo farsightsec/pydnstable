@@ -130,7 +130,9 @@ class TestDNStable(unittest.TestCase):
                   {"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"_ldap._tcp.example.com.","rrtype":"SRV","rdata":"10 1 389 ldap.example.com."},
                   {"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"example.com.","rrtype":"MX","rdata":"10 mail.example.com."},
                   {"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"example.com.","rrtype":"MX","rdata":"20 mail2.example.com."},
-                  {"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"example.com.","rrtype":"SOA","rdata":"hidden-master.example.com. hostmaster.example.com. 2018032701 30 30 86400 300"}]
+                  {"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"example.com.","rrtype":"SOA","rdata":"hidden-master.example.com. hostmaster.example.com. 2018032701 30 30 86400 300"},
+                  {"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"_wildcard_.example.com.","rrtype":"NS","rdata":"foo1.example.com."},
+                  {"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"_WILDCARD_.example.com.","rrtype":"NS","rdata":"foo2.example.com."}]
         q = query(RDATA_NAME, '*.example.com')
         self.run_query_rdata_can_be_string(q, expect)
 
@@ -175,7 +177,9 @@ class TestDNStable(unittest.TestCase):
                   {"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"_ldap._tcp.example.com.","rrtype":"SRV","rdata":["10 1 389 ldap.example.com."]},
                   {"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"example.com.","rrtype":"MX","rdata":["10 mail.example.com."]},
                   {"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"example.com.","rrtype":"MX","rdata":["20 mail2.example.com."]},
-                  {"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"example.com.","rrtype":"SOA","rdata":["hidden-master.example.com. hostmaster.example.com. 2018032701 30 30 86400 300"]}]
+                  {"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"example.com.","rrtype":"SOA","rdata":["hidden-master.example.com. hostmaster.example.com. 2018032701 30 30 86400 300"]},
+                  {"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"_wildcard_.example.com.","rrtype":"NS","rdata":["foo1.example.com."]},
+                  {"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"_WILDCARD_.example.com.","rrtype":"NS","rdata":["foo2.example.com."]}]
         q = query(RDATA_NAME, '*.example.com')
         self.run_query_rdata_always_array(q, expect)
 
@@ -231,10 +235,16 @@ class TestDNStable(unittest.TestCase):
     def test_query_casesensitive(self):
         expect1 = "example.com. IN SOA hidden-master.example.com. hostmaster.example.com. 2018032701 30 30 86400 300\n"
         expect2 = ""
+        expect3 = ";;  bailiwick: example.com.\n;;      count: 1\n;; first seen: 2018-03-27 10:43:28 -0000\n;;  last seen: 2018-03-27 10:43:28 -0000\n_wildcard_.example.com. IN NS foo1.example.com.\n"
+        expect4 = ";;  bailiwick: example.com.\n;;      count: 1\n;; first seen: 2018-03-27 10:43:28 -0000\n;;  last seen: 2018-03-27 10:43:28 -0000\n_WILDCARD_.example.com. IN NS foo2.example.com.\n"
         q1 = query(RDATA_NAME, '*.EXAMPLE.COM', rrtype='SOA', case_sensitive=False)
         q2 = query(RDATA_NAME, '*.EXAMPLE.COM', rrtype='SOA', case_sensitive=True)
+        q3 = query(RRSET, '_WILDCARD_.example.com', rrtype='NS', case_sensitive=False)
+        q4 = query(RRSET, '_WILDCARD_.example.com', rrtype='NS', case_sensitive=True)
         self.run_query_text(q1, expect1)
         self.run_query_text(q2, expect2)
+        self.run_query_text(q3, expect3)
+        self.run_query_text(q4, expect4)
 
 if __name__ == '__main__':
     unittest.main()
