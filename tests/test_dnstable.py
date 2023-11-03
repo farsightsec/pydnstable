@@ -209,7 +209,10 @@ class TestDNStable(unittest.TestCase):
             gotsomething = True
             assert expect == i.to_fmt_dict(), \
                 "expecting:\n    {}\ngot: {}".format(expect, i.to_fmt_dict())
-        assert gotsomething, "Query returned no results"
+        if expect == {}:
+            assert gotsomething == False, "Query results not expected"
+        else:
+            assert gotsomething, "Query returned no results"
 
     def test_formatter_fmt_dict(self):
         expect = {'rrname': 'example.com.', 'rrtype': 'SOA', 'count': 1, 'time_first': 1522147408, 'time_last': 1522147408, 'rdata': ['hidden-master.example.com. hostmaster.example.com. 2018032701 30 30 86400 300']}
@@ -233,18 +236,18 @@ class TestDNStable(unittest.TestCase):
         self.run_query_text(q, expect)
 
     def test_query_casesensitive(self):
-        expect1 = "example.com. IN SOA hidden-master.example.com. hostmaster.example.com. 2018032701 30 30 86400 300\n"
-        expect2 = ""
-        expect3 = ";;  bailiwick: example.com.\n;;      count: 1\n;; first seen: 2018-03-27 10:43:28 -0000\n;;  last seen: 2018-03-27 10:43:28 -0000\n_wildcard_.example.com. IN NS foo1.example.com.\n"
-        expect4 = ";;  bailiwick: example.com.\n;;      count: 1\n;; first seen: 2018-03-27 10:43:28 -0000\n;;  last seen: 2018-03-27 10:43:28 -0000\n_WILDCARD_.example.com. IN NS foo2.example.com.\n"
+        expect1 = {'rrname': 'example.com.', 'rrtype': 'SOA', 'count': 1, 'time_first': 1522147408, 'time_last': 1522147408, 'rdata': ['hidden-master.example.com. hostmaster.example.com. 2018032701 30 30 86400 300']}
+        expect2 = {}
+        expect3 = {'rrname': '_wildcard_.example.com.', 'rrtype': 'NS', 'count': 1, 'time_first': 1522147408, 'time_last': 1522147408, 'rdata': ['foo1.example.com.'], 'bailiwick': 'example.com.'}
+        expect4 = {'rrname': '_WILDCARD_.example.com.', 'rrtype': 'NS', 'count': 1, 'time_first': 1522147408, 'time_last': 1522147408, 'rdata': ['foo2.example.com.'], 'bailiwick': 'example.com.'}
         q1 = query(RDATA_NAME, '*.EXAMPLE.COM', rrtype='SOA', case_sensitive=False)
         q2 = query(RDATA_NAME, '*.EXAMPLE.COM', rrtype='SOA', case_sensitive=True)
         q3 = query(RRSET, '_WILDCARD_.example.com', rrtype='NS', case_sensitive=False)
         q4 = query(RRSET, '_WILDCARD_.example.com', rrtype='NS', case_sensitive=True)
-        self.run_query_text(q1, expect1)
-        self.run_query_text(q2, expect2)
-        self.run_query_text(q3, expect3)
-        self.run_query_text(q4, expect4)
+        self.run_query_fmt_dict(q1, expect1)
+        self.run_query_fmt_dict(q2, expect2)
+        self.run_query_fmt_dict(q3, expect3)
+        self.run_query_fmt_dict(q4, expect4)
 
 if __name__ == '__main__':
     unittest.main()
