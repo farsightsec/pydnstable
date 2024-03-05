@@ -212,7 +212,7 @@ cdef class query(object):
     def __cinit__(self):
         self._instance = NULL
 
-    def __init__(self, qtype, str data, str rrtype=None, str bailiwick=None, time_first_before=None, time_first_after=None, time_last_before=None, time_last_after=None, timeout=None, aggregate=True, uint64_t offset=0):
+    def __init__(self, qtype, str data, str rrtype=None, str bailiwick=None, time_first_before=None, time_first_after=None, time_last_before=None, time_last_after=None, timeout=None, aggregate=True, uint64_t offset=0, case_sensitive=False):
         cdef dnstable_res
         cdef timespec ts
         cdef uint64_t tm
@@ -225,6 +225,10 @@ cdef class query(object):
             raise DnstableException, 'invalid qtype'
         self._instance = dnstable_query_init(qtype)
         self.qtype = qtype
+
+        res = dnstable_query_set_case_sensitive(self._instance, case_sensitive)
+        if res != dnstable_res_success:
+            raise DnstableException, 'dnstable_query_set_case_sensitive() failed: %s' % dnstable_query_get_error(self._instance)
 
         res = dnstable_query_set_data(self._instance, data.encode('UTF-8', errors='backslashreplace'))
         if res != dnstable_res_success:
