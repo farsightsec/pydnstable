@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+# Copyright (c) 2023 DomainTools LLC
 # Copyright (c) 2009-2019 by Farsight Security, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -130,7 +131,9 @@ class TestDNStable(unittest.TestCase):
                   {"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"_ldap._tcp.example.com.","rrtype":"SRV","rdata":"10 1 389 ldap.example.com."},
                   {"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"example.com.","rrtype":"MX","rdata":"10 mail.example.com."},
                   {"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"example.com.","rrtype":"MX","rdata":"20 mail2.example.com."},
-                  {"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"example.com.","rrtype":"SOA","rdata":"hidden-master.example.com. hostmaster.example.com. 2018032701 30 30 86400 300"}]
+                  {"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"example.com.","rrtype":"SOA","rdata":"hidden-master.example.com. hostmaster.example.com. 2018032701 30 30 86400 300"},
+                  {"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"_wildcard_.example.com.","rrtype":"NS","rdata":"foo1.example.com."},
+                  {"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"_WILDCARD_.example.com.","rrtype":"NS","rdata":"foo2.example.com."}]
         q = query(RDATA_NAME, '*.example.com')
         self.run_query_rdata_can_be_string(q, expect)
 
@@ -175,7 +178,9 @@ class TestDNStable(unittest.TestCase):
                   {"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"_ldap._tcp.example.com.","rrtype":"SRV","rdata":["10 1 389 ldap.example.com."]},
                   {"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"example.com.","rrtype":"MX","rdata":["10 mail.example.com."]},
                   {"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"example.com.","rrtype":"MX","rdata":["20 mail2.example.com."]},
-                  {"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"example.com.","rrtype":"SOA","rdata":["hidden-master.example.com. hostmaster.example.com. 2018032701 30 30 86400 300"]}]
+                  {"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"example.com.","rrtype":"SOA","rdata":["hidden-master.example.com. hostmaster.example.com. 2018032701 30 30 86400 300"]},
+                  {"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"_wildcard_.example.com.","rrtype":"NS","rdata":["foo1.example.com."]},
+                  {"count":1,"time_first":1522147408,"time_last":1522147408,"rrname":"_WILDCARD_.example.com.","rrtype":"NS","rdata":["foo2.example.com."]}]
         q = query(RDATA_NAME, '*.example.com')
         self.run_query_rdata_always_array(q, expect)
 
@@ -205,7 +210,10 @@ class TestDNStable(unittest.TestCase):
             gotsomething = True
             assert expect == i.to_fmt_dict(), \
                 "expecting:\n    {}\ngot: {}".format(expect, i.to_fmt_dict())
-        assert gotsomething, "Query returned no results"
+        if expect == {}:
+            assert gotsomething == False, "Query results not expected"
+        else:
+            assert gotsomething, "Query returned no results"
 
     def test_formatter_fmt_dict(self):
         expect = {'rrname': 'example.com.', 'rrtype': 'SOA', 'count': 1, 'time_first': 1522147408, 'time_last': 1522147408, 'rdata': ['hidden-master.example.com. hostmaster.example.com. 2018032701 30 30 86400 300']}
@@ -218,12 +226,29 @@ class TestDNStable(unittest.TestCase):
             gotsomething = True
             assert expect == i.to_text(), \
                 "expecting:\n    '{}'\ngot: '{}'".format(expect, i.to_text())
-        assert gotsomething, "Query returned no results"
+        if expect != "":
+            assert gotsomething, "Query returned no results"
+        else:
+            assert gotsomething == False, "Query results not expected"
 
     def test_formatter_text(self):
         expect = "example.com. IN SOA hidden-master.example.com. hostmaster.example.com. 2018032701 30 30 86400 300\n"
         q = query(RDATA_NAME, '*.example.com', rrtype='SOA')
         self.run_query_text(q, expect)
+
+    def test_query_casesensitive(self):
+        expect1 = {'rrname': 'example.com.', 'rrtype': 'SOA', 'count': 1, 'time_first': 1522147408, 'time_last': 1522147408, 'rdata': ['hidden-master.example.com. hostmaster.example.com. 2018032701 30 30 86400 300']}
+        expect2 = {}
+        expect3 = {'rrname': '_wildcard_.example.com.', 'rrtype': 'NS', 'count': 1, 'time_first': 1522147408, 'time_last': 1522147408, 'rdata': ['foo1.example.com.'], 'bailiwick': 'example.com.'}
+        expect4 = {'rrname': '_WILDCARD_.example.com.', 'rrtype': 'NS', 'count': 1, 'time_first': 1522147408, 'time_last': 1522147408, 'rdata': ['foo2.example.com.'], 'bailiwick': 'example.com.'}
+        q1 = query(RDATA_NAME, '*.EXAMPLE.COM', rrtype='SOA', case_sensitive=False)
+        q2 = query(RDATA_NAME, '*.EXAMPLE.COM', rrtype='SOA', case_sensitive=True)
+        q3 = query(RRSET, '_WILDCARD_.example.com', rrtype='NS', case_sensitive=False)
+        q4 = query(RRSET, '_WILDCARD_.example.com', rrtype='NS', case_sensitive=True)
+        self.run_query_fmt_dict(q1, expect1)
+        self.run_query_fmt_dict(q2, expect2)
+        self.run_query_fmt_dict(q3, expect3)
+        self.run_query_fmt_dict(q4, expect4)
 
 if __name__ == '__main__':
     unittest.main()

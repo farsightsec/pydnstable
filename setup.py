@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# Copyright (c) 2024 DomainTools LLC
 # Copyright (c) 2015-2019 by Farsight Security, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,7 @@
 # limitations under the License.
 
 NAME = 'pydnstable'
-VERSION = '0.7.3'
+VERSION = '0.8.0'
 LICENSE = 'Apache License 2.0'
 DESCRIPTION = 'Python extension module for the dnstable C library'
 URL = 'https://github.com/farsightsec/pydnstable'

@@ -1,4 +1,5 @@
 #cython: embedsignature=True
+# Copyright (c) 2023 DomainTools LLC
 # Copyright (c) 2015-2019 by Farsight Security, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -100,6 +101,7 @@ cdef extern from "dnstable.h" nogil:
     void dnstable_query_destroy(dnstable_query **)
     char * dnstable_query_get_error(dnstable_query *)
     dnstable_res dnstable_query_set_data(dnstable_query *, char *)
+    dnstable_res dnstable_query_set_case_sensitive(dnstable_query *, bool)
     dnstable_res dnstable_query_set_rrtype(dnstable_query *, char *)
     dnstable_res dnstable_query_set_offset(dnstable_query *, uint64_t)
     dnstable_res dnstable_query_set_aggregated(dnstable_query *, bool)
