@@ -1,5 +1,5 @@
 Name:           python3-pydnstable
-Version:        0.7.3
+Version:        0.8.0
 Release:        2%{?dist}
 Summary:        passive DNS encoding format library (Python3 bindings)
 
