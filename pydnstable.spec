@@ -8,6 +8,7 @@ URL:            https://github.com/farsightsec/pydnstable
 Source0:        pydnstable-%{version}.tar.gz
 
 BuildRequires:  dnstable-devel
+BuildRequires:  gcc
 BuildRequires:  python3-devel
 BuildRequires:  python3-Cython
 BuildRequires:  python3-setuptools
