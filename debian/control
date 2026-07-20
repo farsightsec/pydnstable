@@ -1,7 +1,7 @@
 Source: pydnstable
 Section: python
 Priority: optional
-Maintainer: Farsight Security, Inc. <software@farsightsecurity.com>
+Maintainer: DomainTools LLC <software@domaintools.com>
 Build-Depends:
  cython3,
  debhelper-compat (= 13),

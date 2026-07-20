@@ -9,7 +9,7 @@ pydnstable (0.8.0-2) debian-farsightsec; urgency=medium
 
   * Metadata updates for debian 13 trixie.
 
- -- Farsight Security Inc <software@farsightsecurity.com>  Mon, 25 Aug 2025 13:16:35 -0400
+ -- DomainTools LLC <software@domaintools.com>  Mon, 25 Aug 2025 13:16:35 -0400
 
 pydnstable (0.8.0-1) debian-farsightsec; urgency=medium
 
