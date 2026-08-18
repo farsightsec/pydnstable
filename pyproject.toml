@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=42", "Cython>=0.27"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pydnstable"
+version = "0.8.1"
+description = "Python extension module for the dnstable C library"
+readme = "README.md"
+license = {text = "Apache-2.0"}
+requires-python = ">=3.5"
+authors = [
+    {name = "DomainTools LLC", email = "software@farsightsecurity.com"},
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Programming Language :: Cython",
+    "Programming Language :: Python :: 3",
+    "Topic :: Database",
+]
+
+[project.urls]
+Homepage = "https://github.com/farsightsec/pydnstable"
+
+[tool.setuptools]
+py-modules = []
