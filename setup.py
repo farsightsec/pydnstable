@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Copyright (c) 2024 DomainTools LLC
+# Copyright (c) 2026 DomainTools LLC
 # Copyright (c) 2015-2019 by Farsight Security, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,58 +14,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-NAME = 'pydnstable'
-VERSION = '0.8.0'
-LICENSE = 'Apache License 2.0'
-DESCRIPTION = 'Python extension module for the dnstable C library'
-URL = 'https://github.com/farsightsec/pydnstable'
-AUTHOR = 'Farsight Security, Inc.'
-AUTHOR_EMAIL = 'software@farsightsecurity.com'
-
-
 import os
-from distutils.core import setup, Command
-from distutils.extension import Extension
-from distutils.command.clean import clean
-import unittest
+import subprocess
 
-class Test(Command):
-    user_options = []
-    def initialize_options(self):
-        pass
+from setuptools import setup, Extension
 
-    def finalize_options(self):
-        pass
+NAME = "pydnstable"
+VERSION = "0.8.1"
 
-    def run(self):
-        unittest.TextTestRunner(verbosity=1).run(
-            unittest.TestLoader().discover('tests'))
-
-class Cleaner(clean):
-    def run(self):
-        clean.run(self)
-        for i in ["dnstable.c"]:
-            if os.path.isfile(i):
-                print("Cleaning ", i)
-                os.unlink(i)
 
 def pkgconfig(*packages, **kw):
-    import subprocess
-    flag_map = {
-            '-I': 'include_dirs',
-            '-L': 'library_dirs',
-            '-l': 'libraries'
-    }
+    flag_map = {"-I": "include_dirs", "-L": "library_dirs", "-l": "libraries"}
 
     pkg_config_cmd = (
-        'pkg-config',
-        '--cflags',
-        '--libs',
-        ' '.join(packages),
+        "pkg-config",
+        "--cflags",
+        "--libs",
+        " ".join(packages),
     )
 
-    pkg_config_output = subprocess.check_output(pkg_config_cmd,
-                                                universal_newlines=True)
+    pkg_config_output = subprocess.check_output(pkg_config_cmd, universal_newlines=True)
 
     for token in pkg_config_output.split():
         flag = token[:2]
@@ -74,31 +42,24 @@ def pkgconfig(*packages, **kw):
             kw.setdefault(flag_map[flag], []).append(arg)
     return kw
 
+
 try:
-    from Cython.Distutils import build_ext
-    setup(
-        name = NAME,
-        version = VERSION,
-        license = LICENSE,
-        description = DESCRIPTION,
-        url = URL,
-        author = AUTHOR,
-        author_email = AUTHOR_EMAIL,
-        ext_modules = [ Extension('dnstable', ['dnstable.pyx'], **pkgconfig('libdnstable >= 0.11.2')) ],
-        cmdclass = {'build_ext': build_ext, 'clean': Cleaner, 'test': Test}
+    from Cython.Build import cythonize
+
+    ext_modules = cythonize(
+        [Extension("dnstable", ["dnstable.pyx"], **pkgconfig("libdnstable >= 0.11.2"))],
+        language_level="3",
     )
 except ImportError:
-    import os
-    if os.path.isfile('dnstable.c'):
-        setup(
-            name = NAME,
-            version = VERSION,
-            license = LICENSE,
-            description = DESCRIPTION,
-            url = URL,
-            author = AUTHOR,
-            author_email = AUTHOR_EMAIL,
-            ext_modules = [ Extension('dnstable', ['dnstable.c'], **pkgconfig('libdnstable >= 0.11.0')) ],
-        )
+    if os.path.isfile("dnstable.c"):
+        ext_modules = [
+            Extension("dnstable", ["dnstable.c"], **pkgconfig("libdnstable >= 0.11.2"))
+        ]
     else:
         raise
+
+setup(
+    name=NAME,
+    version=VERSION,
+    ext_modules=ext_modules,
+)
