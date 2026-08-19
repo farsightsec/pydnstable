@@ -1,4 +1,4 @@
-pydnstable (0.8.1-1) debian-farsightsec; urgency=medium
+pydnstable (0.8.1) debian-farsightsec; urgency=medium
 
   * Fix build with Cython 3.X.
   * Modernize packaging: add pyproject.toml.
