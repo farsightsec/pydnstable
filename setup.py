@@ -48,7 +48,7 @@ try:
 
     ext_modules = cythonize(
         [Extension("dnstable", ["dnstable.pyx"], **pkgconfig("libdnstable >= 0.11.2"))],
-        language_level="3",
+        language_level = 3,
     )
 except ImportError:
     if os.path.isfile("dnstable.c"):
