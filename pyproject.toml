@@ -10,7 +10,7 @@ readme = "README.md"
 license = {text = "Apache-2.0"}
 requires-python = ">=3.5"
 authors = [
-    {name = "DomainTools LLC", email = "software@farsightsecurity.com"},
+    {name = "DomainTools LLC", email = "software@domaintools.com"},
 ]
 classifiers = [
     "Development Status :: 5 - Production/Stable",

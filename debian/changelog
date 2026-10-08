@@ -3,7 +3,7 @@ pydnstable (0.8.1) debian-farsightsec; urgency=medium
   * Fix build with Cython 3.X.
   * Modernize packaging: add pyproject.toml.
 
- -- Allan LeSage <alesage@domaintools.com>  Mon, 18 Aug 2026 15:00:00 -0400
+ -- DomainTools LLC <software@domaintools.com>  Thu, 08 Oct 2026 18:46:40 -0500
 
 pydnstable (0.8.0-2) debian-farsightsec; urgency=medium
 
